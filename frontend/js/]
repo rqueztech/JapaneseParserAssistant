@@ -1,0 +1,37 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('textForm');
+    const userInput = document.getElementById('userInput');
+    const outputContainer = document.getElementById('outputContainer');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Get the value from the textarea
+        const inputText = userInput.value.trim();
+        const encodedInputText = encodeURIComponent(inputText);
+        const jishoLink = `<a href="https://www.jisho.org/search/${encodedInputText}" target="_blank">${inputText}</a>`;
+
+        // Clean the text
+        const removewhitespace = inputText.replace(/\s+/g, ' ');
+
+        // Create new elements for the output
+        const newTitle = document.createElement('div');
+        const newOutputBox = document.createElement('div');
+
+        // Assign classes to new elements
+        newTitle.classList.add('titlelinks');
+        newOutputBox.classList.add('box');
+
+        // Set inner HTML of new elements
+        newTitle.innerHTML = jishoLink;
+        newOutputBox.textContent = inputText;
+
+        // Append new elements to the output container
+        outputContainer.appendChild(newTitle);
+        outputContainer.appendChild(newOutputBox);
+
+        // Clear the textarea after creating output box (optional)
+        userInput.value = '';
+    });
+});
+
