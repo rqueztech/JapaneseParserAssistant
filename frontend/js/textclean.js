@@ -4234,7 +4234,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                                 if (kanjiType === "Both") {
                                     onyomireadings = kanjiinformationarray[1];
-                                    onyomireadings = kanjiinformationarray[3];
+                                    kunyomireadings = kanjiinformationarray[3];
                                     onyomiCount = kanjiinformationarray[2];
                                     kunyomiCount = kanjiinformationarray[4];
 
@@ -4336,9 +4336,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     outputContainersHTML.push(newOutputBox);
                     console.log(outputContainersHTML);
                     outputContainer.appendChild(newOutputBox);
-                } 
+                }
             }
         });
+
+        console.log();
 
         currentIndex++;
 
