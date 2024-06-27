@@ -4163,16 +4163,33 @@ async function populateMapsAsync() {
     ]);
 }
 
+let currentIndex = 0;
+
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("FREQUENCYMAP******", frequencymap)
-    console.log("", definitionsmap)
+    
+
+    const outputContainersHTML = [];
 
     const form = document.getElementById('textForm');
     const userInput = document.getElementById('userInput');
     const outputContainer = document.getElementById('outputContainer');
+    const previousButton = document.getElementById('previousButton');
+
+    previousButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        outputContainer.innerHTML = '';
+        if (currentIndex > 0) {
+            currentIndex--;
+        }
+        outputContainer.innerHTML = outputContainersHTML[currentIndex];
+        outputContainer.appendChild(newTitle);
+    });
 
     form.addEventListener('submit', function(event) {
+
+        console.log("=====> OUTUPT ", currentIndex)
         event.preventDefault(); // Prevent form submission
+        outputContainer.innerHTML = ''; // Clear the output container
 
         // Get the value from the textarea
         let inputText = userInput.value.trim(); // Use let instead of const
@@ -4235,11 +4252,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 } 
 
                 const originallinkjoined = originalpassagewithlinks.join('');
-                console.log("#*#*#*#*DO -> ", originallinkjoined);
+                
 
                 const encodedInputText = encodeURIComponent(line);
-                const jishoLink = `<a href="https://www.jisho.org/search/${line}" target="_blank">${originallinkjoined}</a>
-                <br><a href = "https://translate.google.com/?sl=auto&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a>
+                const jishoLink = `${originallinkjoined}<br><a href="https://www.jisho.org/search/${line}" target="_blank">Jisho Link</a>
+                  <a href = "https://translate.google.com/?sl=auto&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a>
                 <br>`;
 
                 const newTitle = document.createElement('div');
@@ -4254,7 +4271,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     newOutputBox.classList.add('box');
                     
                     let currentkanji = kanjionlycleaned[kanji];
-                    console.log(currentkanji)
+                    
                     
                     let kanjiimportant = "";
                     let kanjidefinitions = "";
@@ -4285,27 +4302,31 @@ document.addEventListener('DOMContentLoaded', function() {
                             kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
                         }
 
-                        console.log("Frequency Important", kanjiimportant);
+                        
                     } else {
                         kanjiimportant = "";
-                        console.log("Frequency Important Not Found")
+                        
                     }
 
                     if (typeof definitionsmap !== 'undefined') {
                         kanjidefinitions = definitionsmap.get(currentkanji);
-                        console.log("Kanji Definitions", kanjidefinitions);
+                        
                     } else {
                         kanjidefinitions = "";
-                        console.log("Kanji Definitions Not Found");
+                        
                     }
 
                     let combinedoutput = '<a href="https://www.jisho.org/search/' + currentkanji +'%20%23kanji" target = "blank">' + currentkanji + '</a>' + '<br>' + kanjiimportant + '<br>' + kanjidefinitions;
 
                     newOutputBox.innerHTML = combinedoutput;
+                    outputContainersHTML.push(newOutputBox);
+                    console.log(outputContainersHTML);
                     outputContainer.appendChild(newOutputBox);
                 } 
             }
         });
+
+        currentIndex++;
 
         // Clear the textarea after creating output box (optional)
         userInput.value = '';
