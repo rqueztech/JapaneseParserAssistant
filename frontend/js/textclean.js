@@ -4221,6 +4221,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     let kunyomiCount = 0;
                     let onyomiCount = 0;
 
+                    let onyomireadings = "";
+                    let kunyomireadings = "";
+
                     if (isakanji.test(currentkanjiinlink)) {
                         if (definitionsmap.has(currentkanjiinlink)) {
                             if (frequencymap.has(currentkanjiinlink)) {
@@ -4230,18 +4233,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let kanjiType = kanjiinformationarray[0];
 
                                 if (kanjiType === "Both") {
+                                    onyomireadings = kanjiinformationarray[1];
+                                    onyomireadings = kanjiinformationarray[3];
                                     onyomiCount = kanjiinformationarray[2];
                                     kunyomiCount = kanjiinformationarray[4];
 
                                 } else if (kanjiType === "Onyomi") {
+                                    onyomireadings = kanjiinformationarray[1];
                                     onyomiCount = kanjiinformationarray[2];
                                 } else if (kanjiType === "Kunyomi") {
+                                    kunyomireadings = kanjiinformationarray[1];
                                     kunyomiCount = kanjiinformationarray[2];
                                 }
                             }
 
                             let currentdefinition = definitionsmap.get(currentkanjiinlink);
-                            let currentdefinitionlinked = `<span class='tooltip'>${currentkanjiinlink}<span class='tooltip-text'>${currentdefinition + "<br>音読み: " + onyomiCount + "<br>訓読み: " + kunyomiCount}</span></span>`;
+                            let currentdefinitionlinked = `<span class='tooltip'>${currentkanjiinlink}<span class='tooltip-text'>${currentdefinition}<br>音読み: ${onyomiCount} ${onyomireadings} <br>訓読み: ${kunyomiCount} ${kunyomireadings}</span></span>`;
                             originalpassagewithlinks.push(currentdefinitionlinked);
                         } else {
                             originalpassagewithlinks.push("No Definition Found");
@@ -4275,16 +4282,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     let kanjiimportant = "";
                     let kanjidefinitions = "";
+                   
+
+                    let onyomireadings = "";
+                    let onyomifrequency = "";
+                    let kunyomireadings = "";
+                    let kunyomifrequency = "";
+
 
                     if (typeof frequencymap !== 'undefined') {
                         kanjiimportant = frequencymap.get(currentkanji);
                         kanjiimportant = kanjiimportant.split('*')
 
                         if (kanjiimportant[0] === "Both") {
-                            let onyomireadings = kanjiimportant[1];
-                            let onyomifrequency = kanjiimportant[2];
-                            let kunyomireadings = kanjiimportant[3].split('、');
-                            let kunyomifrequency = kanjiimportant[4];
+                            onyomireadings = kanjiimportant[1];
+                            onyomifrequency = kanjiimportant[2];
+                            kunyomireadings = kanjiimportant[3].split('、');
+                            kunyomifrequency = kanjiimportant[4];
 
 
                             for (let x = 0; x < kunyomireadings.length; x++) {
@@ -4293,12 +4307,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                             kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})<br>Kun: ${kunyomireadings} (${kunyomifrequency})`;
                         } else if (kanjiimportant[0] === "Onyomi") {
-                            let onyomireadings = kanjiimportant[1].split('、');
-                            let onyomifrequency = kanjiimportant[2];
+                            onyomireadings = kanjiimportant[1].split('、');
+                            onyomifrequency = kanjiimportant[2];
                             kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})`;
                         } else if (kanjiimportant[0] === "Kun") {
-                            let kunyomireadings = kanjiimportant[1].split('、');
-                            let kunyomifrequency = kanjiimportant[2];
+                            kunyomireadings = kanjiimportant[1].split('、');
+                            kunyomifrequency = kanjiimportant[2];
                             kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
                         }
 
