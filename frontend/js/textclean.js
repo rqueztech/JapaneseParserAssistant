@@ -4163,8 +4163,6 @@ async function populateMapsAsync() {
     ]);
 }
 
-let counter = 0;
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log("FREQUENCYMAP******", frequencymap)
     console.log("", definitionsmap)
@@ -4173,13 +4171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const userInput = document.getElementById('userInput');
     const outputContainer = document.getElementById('outputContainer');
 
-
-    
     form.addEventListener('submit', function(event) {
-        console.log(counter)
-
-
-
         event.preventDefault(); // Prevent form submission
 
         // Get the value from the textarea
