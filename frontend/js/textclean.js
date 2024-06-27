@@ -2008,10 +2008,10 @@ const frequencymap = new Map([
     ['鞄','Both*ハク*1*かばん*1'],
     ['誰','Both*スイ*1*だれ*1'],
     ['挨','Both*アイ*1*ひら－く*1'],
-    ['拶','Both*サツ*1*あいさつ*1']
+    ['拶','Both*サツ*1*あいさつ*1'],
 ]);
 
-const defintionsmap = new Map([
+const definitionsmap = new Map([
     ['亜','subー、 Asia'],
     ['哀','pathetic'],
     ['挨','push open'],
@@ -4147,10 +4147,13 @@ const defintionsmap = new Map([
     ['惑','beguile'],
     ['枠','frame'],
     ['湾','gulf'],
-    ['腕','arm']
+    ['腕','arm'],
 ]);
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("FREQUENCYMAP******", frequencymap)
+    console.log("", definitionsmap)
+    
     const form = document.getElementById('textForm');
     const userInput = document.getElementById('userInput');
     const outputContainer = document.getElementById('outputContainer');
@@ -4177,10 +4180,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (line.trim()) { // Check if the line is not empty
                 const removenonkanji = /[^\u4e00-\u9fff]/g;
+                const isakanji = /[\u4e00-\u9fff]/g;
                 let kanjionlycleaned = line.replace(removenonkanji, '');
+                kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join(''); // Remove duplicates
+
+                const originalpassagewithlinks = [];
+
+                for (let kanji = 0; kanji < line.length; kanji++) {
+                    let currentkanjiinlink = line[kanji];
+                    if (isakanji.test(currentkanjiinlink)) {
+                        if (frequencymap.has(currentkanjiinlink)) {
+                            let currentdefinition = definitionsmap.get(currentkanjiinlink);
+                            let currentdefinitionlinked = `<span class='tooltip'>${currentkanjiinlink}<span class='tooltip-text'>${currentdefinition}</span></span>`;
+                            originalpassagewithlinks.push(currentdefinitionlinked);
+                            console.log("in->", currentkanjiinlink, " found");
+                        } else {
+                            originalpassagewithlinks.push("No Definition Found");
+                            console.log("in->", currentkanjiinlink, " no def");
+                        }
+                    } else {
+                        originalpassagewithlinks.push(currentkanjiinlink);
+                        console.log("in->", currentkanjiinlink, " nf in map");
+                    }
+                } 
+
+                const originallinkjoined = originalpassagewithlinks.join('');
+                console.log("#*#*#*#*DO -> ", originallinkjoined);
 
                 const encodedInputText = encodeURIComponent(line);
-                const jishoLink = `<a href="https://www.jisho.org/search/${line}" target="_blank">${line}</a>`;
+                const jishoLink = `<a href="https://www.jisho.org/search/${line}" target="_blank">${originallinkjoined}</a>
+                <br><a href = "https://translate.google.com/?sl=auto&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a>
+                <br>`;
 
                 const newTitle = document.createElement('div');
                 const newOutputBox = document.createElement('div');
@@ -4194,12 +4224,37 @@ document.addEventListener('DOMContentLoaded', function() {
                     newOutputBox.classList.add('box');
                     
                     let currentkanji = kanjionlycleaned[kanji];
-
+                    console.log(currentkanji)
+                    
                     let kanjiimportant = "";
                     let kanjidefinitions = "";
 
                     if (typeof frequencymap !== 'undefined') {
                         kanjiimportant = frequencymap.get(currentkanji);
+                        kanjiimportant = kanjiimportant.split('*')
+
+                        if (kanjiimportant[0] === "Both") {
+                            let onyomireadings = kanjiimportant[1];
+                            let onyomifrequency = kanjiimportant[2];
+                            let kunyomireadings = kanjiimportant[3].split('、');
+                            let kunyomifrequency = kanjiimportant[4];
+
+
+                            for (let x = 0; x < kunyomireadings.length; x++) {
+                                let kunyomilinks = kunyomireadings[x].replace('－', '') ;
+                                kunyomireadings[x] = '<a href="https://www.jisho.org/search/' + currentkanji + "%20" + kunyomilinks + '" target="_blank">' + kunyomireadings[x] + '</a>';
+                            }
+                            kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})<br>Kun: ${kunyomireadings} (${kunyomifrequency})`;
+                        } else if (kanjiimportant[0] === "Onyomi") {
+                            let onyomireadings = kanjiimportant[1].split('、');
+                            let onyomifrequency = kanjiimportant[2];
+                            kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})`;
+                        } else if (kanjiimportant[0] === "Kun") {
+                            let kunyomireadings = kanjiimportant[1].split('、');
+                            let kunyomifrequency = kanjiimportant[2];
+                            kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
+                        }
+
                         console.log("Frequency Important", kanjiimportant);
                     } else {
                         kanjiimportant = "";
@@ -4214,9 +4269,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log("Kanji Definitions Not Found");
                     }
 
-                    let combinedoutput = currentkanji + " " + kanjiimportant + " " + kanjidefinitions;
+                    let combinedoutput = '<a href="https://www.jisho.org/search/' + currentkanji +'%20%23kanji" target = "blank">' + currentkanji + '</a>' + '<br>' + kanjiimportant + '<br>' + kanjidefinitions;
 
-                    newOutputBox.textContent = combinedoutput;
+
+                    newOutputBox.innerHTML = combinedoutput;
                     outputContainer.appendChild(newOutputBox);
                 } 
             }
