@@ -4166,8 +4166,6 @@ async function populateMapsAsync() {
 let currentIndex = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
-    
-
     const outputContainersHTML = [];
 
     const form = document.getElementById('textForm');
@@ -4182,10 +4180,9 @@ document.addEventListener('DOMContentLoaded', function() {
             currentIndex--;
         }
         outputContainer.innerHTML = outputContainersHTML[currentIndex];
-        outputContainer.appendChild(newTitle);
     });
 
-    form.addEventListener('submit', function(event) {
+    function cleanUserInput() {
 
         console.log("=====> OUTUPT ", currentIndex)
         event.preventDefault(); // Prevent form submission
@@ -4203,7 +4200,11 @@ document.addEventListener('DOMContentLoaded', function() {
         inputText = inputText.replace(eliminateUnwantedWords, '');
 
         // Split into tokenized words (lines)
-        const tokenizedWords = inputText.split('\n');
+        return inputText.split('\n');
+    }
+
+    form.addEventListener('submit', function(event) {
+        const tokenizedWords = cleanUserInput()
 
         // Create new elements for the output
         tokenizedWords.forEach(line => {
@@ -4248,7 +4249,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
 
                             let currentdefinition = definitionsmap.get(currentkanjiinlink);
-                            let currentdefinitionlinked = `<span class='tooltip'>${currentkanjiinlink}<span class='tooltip-text'>${currentdefinition}<br>音読み: ${onyomiCount} ${onyomireadings} <br>訓読み: ${kunyomiCount} ${kunyomireadings}</span></span>`;
+                            let currentdefinitionlinked = `<span class='tooltip'>${currentkanjiinlink}<span class='tooltip-text'>${currentdefinition}<br>音: ${onyomiCount} <br>訓: ${kunyomiCount} </span></span>`;
                             originalpassagewithlinks.push(currentdefinitionlinked);
                         } else {
                             originalpassagewithlinks.push("No Definition Found");
@@ -4272,6 +4273,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 newTitle.classList.add('titlelinks');
                 newTitle.innerHTML = jishoLink;
                 outputContainer.appendChild(newTitle);
+                outputContainersHTML.push(newOutputBox);
                 
                for (let kanji = 0; kanji < kanjionlycleaned.length; kanji++) {
                     const newOutputBox = document.createElement('div');
@@ -4333,11 +4335,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     let combinedoutput = '<a href="https://www.jisho.org/search/' + currentkanji +'%20%23kanji" target = "blank">' + currentkanji + '</a>' + '<br>' + kanjiimportant + '<br>' + kanjidefinitions;
 
                     newOutputBox.innerHTML = combinedoutput;
-                    outputContainersHTML.push(newOutputBox);
-                    console.log(outputContainersHTML);
                     outputContainer.appendChild(newOutputBox);
+                    outputContainersHTML.push(outputContainer);
                 }
             }
+
+            console.log(outputContainer)
         });
 
         console.log();
