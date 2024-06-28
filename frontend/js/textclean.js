@@ -4170,48 +4170,37 @@ const isakanji = /[\u4e00-\u9fff]/;
 const eliminateLeadingSpaces = /^\s+/g;
 const eliminateUnwantedWords = /^(?![\u3040-\u309f\u30ao-\u30ff\u4e00-\u9fff]).*$/gm;
 
-
 document.addEventListener('DOMContentLoaded', function() {
-    const outputContainersHTML = [];
     const form = document.getElementById('textForm');
     const userInput = document.getElementById('userInput');
     const outputContainer = document.getElementById('outputContainer');
     const previousButton = document.getElementById('previousButton');
-    
 
     previousButton.addEventListener('click', function(event) {
         event.preventDefault();
         if (currentIndex > 0) {
             currentIndex--;
+            outputContainer.innerHTML = ''; // Clear output
+            outputContainer.appendChild(outputContainersHTML[currentIndex]);
         }
-        outputContainer.innerHTML = outputContainersHTML[currentIndex];
     });
 
-    function cleanUserInput() {
-
-        console.log("=====> OUTUPT ", currentIndex);
+    async function cleanUserInput() {
         event.preventDefault(); // Prevent form submission
 
         // Get the value from the textarea
-        let inputText = userInput.value.trim(); // Use let instead of const
+        let inputText = userInput.value.trim();
         inputText = inputText.replace(removeleadingnonjapanese, '');
-
-        // Eliminate leading spaces
         inputText = inputText.replace(eliminateLeadingSpaces, '');
-
-        // Eliminate unwanted words
         inputText = inputText.replace(eliminateUnwantedWords, '');
-
 
         // Split into tokenized words (lines)
         return inputText.split('\n');
     }
 
-    function createkanjiboxes(kanjionlycleaned) {
-        for (let kanji = 0; kanji < kanjionlycleaned.length; kanji++) {
-            console.log(kanjionlycleaned[kanji]);
-            
-            let currentkanji = kanjionlycleaned[kanji];
+    async function createkanjiboxes(kanjionlycleaned) {
+        for (let kanji of kanjionlycleaned) {
+            let currentkanji = kanji.trim();
             let kanjiimportant = "";
             let kanjidefinitions = "";
             let onyomireadings = "";
@@ -4219,10 +4208,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let kunyomireadings = "";
             let kunyomifrequency = "";
 
-
-            if (typeof frequencymap !== 'undefined') {
-                kanjiimportant = frequencymap.get(currentkanji);
-                kanjiimportant = kanjiimportant.split('*')
+            if (frequencymap && frequencymap.has(currentkanji)) {
+                kanjiimportant = frequencymap.get(currentkanji).split('*');
 
                 if (kanjiimportant[0] === "Both") {
                     onyomireadings = kanjiimportant[1];
@@ -4230,11 +4217,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     kunyomireadings = kanjiimportant[3].split('、');
                     kunyomifrequency = kanjiimportant[4];
 
+                    kunyomireadings = kunyomireadings.map(link => {
+                        return `<a href="https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}" target="_blank">${link}</a>`;
+                    });
 
-                    for (let x = 0; x < kunyomireadings.length; x++) {
-                        let kunyomilinks = kunyomireadings[x].replace('－', '') ;
-                        kunyomireadings[x] = '<a href="https://www.jisho.org/search/' + currentkanji + "%20" + kunyomilinks + '" target="_blank">' + kunyomireadings[x] + '</a>';
-                    }
                     kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})<br>Kun: ${kunyomireadings} (${kunyomifrequency})`;
                 } else if (kanjiimportant[0] === "Onyomi") {
                     onyomireadings = kanjiimportant[1].split('、');
@@ -4245,58 +4231,54 @@ document.addEventListener('DOMContentLoaded', function() {
                     kunyomifrequency = kanjiimportant[2];
                     kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
                 }
-                
-            } else {
-                kanjiimportant = "";
             }
 
-            if (typeof definitionsmap !== 'undefined') {
+            if (definitionsmap && definitionsmap.has(currentkanji)) {
                 kanjidefinitions = definitionsmap.get(currentkanji);
-            } else {
-                kanjidefinitions = "";
             }
 
-            let combinedoutput = '<a href="https://www.jisho.org/search/' + currentkanji +'%20%23kanji" target = "blank">' + currentkanji + '</a>' + '<br>' + kanjiimportant + '<br>' + kanjidefinitions;
+            let combinedoutput = `<a href="https://www.jisho.org/search/${currentkanji}%20%23kanji" target="_blank">${currentkanji}</a><br>${kanjiimportant}<br>${kanjidefinitions}`;
+
+            const newOutputBox = document.createElement('div');
+            newOutputBox.classList.add('box');
+            newOutputBox.innerHTML = combinedoutput;
 
             outputContainer.appendChild(newOutputBox);
         }
     }
 
-    function createtooltips(line) {
+    async function createtooltips(line) {
         let originalpassagewithlinks = [];
 
-        for (let kanji = 0; kanji < line.length; kanji++) {
-            let currentkanjiinlink = line[kanji];
+        for (let kanji of line) {
+            let currentkanjiinlink = kanji.trim();
             let kunyomiCount = 0;
             let onyomiCount = 0;
-
             let onyomireadings = "";
             let kunyomireadings = "";
 
             if (isakanji.test(currentkanjiinlink)) {
-                if (definitionsmap.has(currentkanjiinlink)) {
-                    if (frequencymap.has(currentkanjiinlink)) {
-                        let kanjiinformation = frequencymap.get(currentkanjiinlink);
-                        let kanjiinformationarray = kanjiinformation.split('*');
+                if (definitionsmap && definitionsmap.has(currentkanjiinlink)) {
+                    let currentdefinition = definitionsmap.get(currentkanjiinlink);
 
-                        let kanjiType = kanjiinformationarray[0];
+                    if (frequencymap && frequencymap.has(currentkanjiinlink)) {
+                        let kanjiinformation = frequencymap.get(currentkanjiinlink).split('*');
+                        let kanjiType = kanjiinformation[0];
 
                         if (kanjiType === "Both") {
-                            onyomireadings = kanjiinformationarray[1];
-                            kunyomireadings = kanjiinformationarray[3];
-                            onyomiCount = kanjiinformationarray[2];
-                            kunyomiCount = kanjiinformationarray[4];
-
+                            onyomireadings = kanjiinformation[1];
+                            kunyomireadings = kanjiinformation[3];
+                            onyomiCount = kanjiinformation[2];
+                            kunyomiCount = kanjiinformation[4];
                         } else if (kanjiType === "Onyomi") {
-                            onyomireadings = kanjiinformationarray[1];
-                            onyomiCount = kanjiinformationarray[2];
+                            onyomireadings = kanjiinformation[1];
+                            onyomiCount = kanjiinformation[2];
                         } else if (kanjiType === "Kunyomi") {
-                            kunyomireadings = kanjiinformationarray[1];
-                            kunyomiCount = kanjiinformationarray[2];
+                            kunyomireadings = kanjiinformation[1];
+                            kunyomiCount = kanjiinformation[2];
                         }
                     }
 
-                    let currentdefinition = definitionsmap.get(currentkanjiinlink);
                     let currentdefinitionlinked = `<span class='tooltip'>${currentkanjiinlink}<span class='tooltip-text'>${currentdefinition}<br>音: ${onyomiCount} <br>訓: ${kunyomiCount} </span></span>`;
                     originalpassagewithlinks.push(currentdefinitionlinked);
                 } else {
@@ -4305,51 +4287,45 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 originalpassagewithlinks.push(currentkanjiinlink);
             }
-
-            const boxToAdd = document.createElement('div')
-            boxToAdd.classlist.add('box')
-            boxToAdd.innerHTML = originalpassagewithlinks.join('');
         }
 
         return originalpassagewithlinks.join('');
     }
 
-    form.addEventListener('submit', function(event) {
-        const tokenizedWords = cleanUserInput()
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        outputContainer.innerHTML = ''; // Clear previous output
+
+        const tokenizedWords = await cleanUserInput();
 
         // Create new elements for the output
-        tokenizedWords.forEach(line => {
-            if (line.trim()) { // Check if the line is not empty
+        for (let line of tokenizedWords) {
+            if (line.trim()) {
                 let kanjionlycleaned = line.replace(removenonkanji, '');
-                kanjionlycleaned = Array.from(new Set(kanjionlycleaned/a)).join(''); // Remove duplicates
+                kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join(''); // Remove duplicates
 
-                let originallinkjoined = createtooltips(line);
+                let originallinkjoined = await createtooltips(line);
 
                 const encodedInputText = encodeURIComponent(line);
-                const exampleWithLinks = `${originallinkjoined}<br><a href="https://www.jisho.org/search/${line}" target="_blank">Jisho Link</a><a href = "https://translate.google.com/?sl=auto&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a><br>`;
-                
+                const exampleWithLinks = `${originallinkjoined}<br><a href="https://www.jisho.org/search/${line}" target="_blank">Jisho Link</a><a href="https://translate.google.com/?sl=auto&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a><br>`;
+
                 const newTitle = document.createElement('div');
                 newTitle.classList.add('titlelinks');
                 newTitle.innerHTML = exampleWithLinks;
-                
+
                 outputContainer.appendChild(newTitle);
 
-                createkanjiboxes(kanjionlycleaned);
+                await createkanjiboxes(kanjionlycleaned);
             }
+        }
 
-
-        });
-
-
+        outputContainersHTML[currentIndex] = outputContainer.innerHTML;
         currentIndex++;
-
-        // Clear the textarea after creating output box (optional)
-        userInput.value = '';
-        event.preventDefault();
+        userInput.value = ''; // Clear input field
     });
 
     async function main() {
-        await populateMapsAsync();
+        await populateMapsAsync(); // Assuming this function populates frequencymap and definitionsmap
     }
 
     main();
