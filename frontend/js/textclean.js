@@ -2078,6 +2078,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     kunyomireadings = kanjiimportant[3].split('、');
                     kunyomifrequency = kanjiimportant[4];
                     kanjidefinitions = kanjiimportant[5];
+                    kanjidefinitions = kanjidefinitions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
 
                     kunyomireadings = kunyomireadings.map(link => {
                         return `<a href="https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}" target="_blank">${link}</a>`;
@@ -2088,16 +2089,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     onyomireadings = kanjiimportant[1].split('、');
                     onyomifrequency = kanjiimportant[2];
                     kanjidefinitions = kanjiimportant[3];
+                    kanjidefinitions = kanjidefinitions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
                     kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})`;
                 } else if (kanjiimportant[0] === "Kun") {
                     kunyomireadings = kanjiimportant[1].split('、');
                     kunyomifrequency = kanjiimportant[2];
                     kanjidefinitions = kanjiimportant[3];
+                    kanjidefinitions = kanjiDefintions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
                     kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
                 }
             }
 
-            let combinedoutput = `<a href="https://www.jisho.org/search/${currentkanji}%20%23kanji" target="_blank" class = "kanjilink">${currentkanji}</a><br>${kanjiimportant}<br><br>${kanjidefinitions}<br><br>`;
+            let combinedoutput = `<br><a href="https://www.jisho.org/search/${currentkanji}%20%23kanji" target="_blank" class = "kanjilink">${currentkanji}</a><br>${kanjidefinitions}<br>${kanjiimportant}`;
 
             const newOutputBox = document.createElement('div');
             newOutputBox.classList.add('box');
@@ -2143,7 +2146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
 
-                    let currentdefinitionlinked = `<span class='tooltip'><a href = \"https://www.jisho.org/search/${currentkanjiinlink}%20%23kanji\" target = \"_blank\">${currentkanjiinlink}</a><span class='tooltip-text'>${currentdefinition}<br>音: ${onyomiCount} <br>訓: ${kunyomiCount} </span></span>`;
+                    let currentdefinitionlinked = `<span class='tooltip'><a href = \"https://www.jisho.org/search/${currentkanjiinlink}%20%23kanji\" target = \"_blank\" class = \"link1\">${currentkanjiinlink}</a><span class='tooltip-text'>音: ${onyomiCount} <br>訓: ${kunyomiCount} </span></span>`;
                     originalpassagewithlinks.push(currentdefinitionlinked);
                 } else {
                     originalpassagewithlinks.push("No Definition Found");
@@ -2171,7 +2174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let originallinkjoined = await createtooltips(line);
 
                 const encodedInputText = encodeURIComponent(line);
-                const exampleWithLinks = `${originallinkjoined}<br><a href="https://www.jisho.org/search/${line}" target="_blank">Jisho Link</a><a href="https://translate.google.com/?sl=auto&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a><br>`;
+                const exampleWithLinks = `${originallinkjoined}<br><br><a href="https://www.jisho.org/search/${line}" target="_blank">Jisho Link</a>    <a href="https://translate.google.com/?sl=ja&tl=en&text=${encodedInputText}&op=translate" target="_blank">Translate</a><br>`;
 
                 const newTitle = document.createElement('div');
                 newTitle.classList.add('titlelinks');

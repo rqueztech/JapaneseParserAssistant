@@ -21,6 +21,8 @@ button {
 }
 
 .tooltip {
+    font-size: 30px;
+    color: black;
     position: relative;
     display: inline-block;
     cursor: pointer;
@@ -64,14 +66,14 @@ button {
 }
 
 .box {
-    padding: 20px;
     background-color: #76c1d4;
     font-size: 20px;
     color: black;
+    padding: 10px;
     border-radius: 10px;
     justify-content: center;
     align-items: center;
-    flex: 0 0 20%;
+    flex: 0 0 15%;
     margin: 1%;
     text-align: center;
 }
@@ -88,7 +90,7 @@ button {
     font-size: 30px;
     text-align: center;
     background-color: #f7f7f7;
-    width: 90%;
+    width: 95%;
     margin: 0 auto;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -111,17 +113,22 @@ button {
     font-weight: bold;
 }
 
+a.kanjilink {
+    font-size: 30px;
+    text-decoration: none;
+    padding-bottom: 10px;
+    font-weight: bold;
+    color: black;
+}
+
 #maintitle {
     background-color: #fbb80f;
-    margin-top: 30px;
     border-radius: 10px;
-    margin-padding: 10px;
     color: black;
+    padding: 15px;
     text-align: center;
     justify-content: center;
     align-items: center;
-    padding-top: 20px;
-    padding-bottom: 20px;
     width: 40%;
     flex: 0 0 30%;
     margin: 0 auto;
