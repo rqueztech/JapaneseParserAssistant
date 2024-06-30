@@ -2077,6 +2077,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     onyomifrequency = kanjiimportant[2];
                     kunyomireadings = kanjiimportant[3].split('、');
                     kunyomifrequency = kanjiimportant[4];
+                    kanjidefinitions = kanjiimportant[5];
 
                     kunyomireadings = kunyomireadings.map(link => {
                         return `<a href="https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}" target="_blank">${link}</a>`;
@@ -2086,19 +2087,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (kanjiimportant[0] === "Onyomi") {
                     onyomireadings = kanjiimportant[1].split('、');
                     onyomifrequency = kanjiimportant[2];
+                    kanjidefinitions = kanjiimportant[3];
                     kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})`;
                 } else if (kanjiimportant[0] === "Kun") {
                     kunyomireadings = kanjiimportant[1].split('、');
                     kunyomifrequency = kanjiimportant[2];
+                    kanjidefinitions = kanjiimportant[3];
                     kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
                 }
             }
 
-            if (definitionsmap && definitionsmap.has(currentkanji)) {
-                kanjidefinitions = definitionsmap.get(currentkanji);
-            }
-
-            let combinedoutput = `<a href="https://www.jisho.org/search/${currentkanji}%20%23kanji" target="_blank" class = "kanjilink">${currentkanji}</a><br>${kanjiimportant}<br>${kanjidefinitions}`;
+            let combinedoutput = `<a href="https://www.jisho.org/search/${currentkanji}%20%23kanji" target="_blank" class = "kanjilink">${currentkanji}</a><br>${kanjiimportant}<br><br>${kanjidefinitions}<br><br>`;
 
             const newOutputBox = document.createElement('div');
             newOutputBox.classList.add('box');
