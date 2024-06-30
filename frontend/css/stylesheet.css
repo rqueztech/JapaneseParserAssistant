@@ -56,6 +56,13 @@ button {
     flex-wrap: wrap;
 }
 
+.class "kanjilink" {
+    font-size: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+}
+
 .box {
     padding: 20px;
     background-color: #76c1d4;
@@ -71,13 +78,8 @@ button {
 
 .titlelinks a {
     text-decoration: none;
-    background-color: black;
-    border-radius: 5px;
-    padding-top: 20px;
-    padding: 10px;
-    font-size: 15px;
-    color: white;
     font-weight: bold;
+    color: black;
 }
 
 .titlelinks {
@@ -106,7 +108,7 @@ button {
 .box a {
     font-size: 20px;
     text-decoration: none;
-    color: black;
+    font-weight: bold;
 }
 
 #maintitle {
