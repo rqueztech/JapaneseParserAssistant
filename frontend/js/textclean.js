@@ -3425,7 +3425,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     let kanjilink = document.createElement('a');
                     kanjilink.class = 'kanjilink';
-                    kanjilink.href = `https://www.jisho.org/search/${kanji}`;
+                    kanjilink.href = `https://www.jisho.org/search/${kanji}%20%23kanji`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
 
@@ -3451,15 +3451,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     kanjiboxlink.appendChild(document.createElement('br'));
 
                     kunyomireadings.forEach(link => {
-                        let splitlink = link.split('－');
-                        let secondword = splitlink[1];
-                        let fullword = `${currentkanji}${secondword}`;
+                        let splitlink = "";
+                        let fullword = "";
+                        let secondword = "";
+
+                        if(link.includes('－')) {
+                            splitlink = link.split('－');
+                            secondword = splitlink[1];
+                            fullword = `${currentkanji}${secondword}`;
+                        } else {
+                            fullword = link;
+                        }
+
                         let transtype = "";
 
                         let a = document.createElement('a');
                         a.href = `https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}`;
                         if (transativitymap.has(fullword)) {
                             let transplit = transativitymap.get(fullword);
+
                             transplit = transplit.split('*');
                             if (transplit[0] === 'Transative') {
                                 transtype = link + ' (他 - Tr)';
@@ -3474,6 +3484,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             } else if (transplit[0] === 'naAdj') {
                                 transtype = link + ' (naAdv)';
                             }
+                        } else {
+                            transtype = fullword + ' Root';
                         }
                         a.target = '_blank';
                         a.textContent = transtype;
@@ -3489,7 +3501,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     let kanjilink = document.createElement('a');
                     kanjilink.class = 'kanjilink';
-                    kanjilink.href = `https://www.jisho.org/search/${kanji}`;
+                    kanjilink.href = `https://www.jisho.org/search/${kanji}%20%23kanji`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
 
@@ -3518,7 +3530,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     let kanjilink = document.createElement('a');
                     kanjilink.class = 'kanjilink';
-                    kanjilink.href = `https://www.jisho.org/search/${kanji}`;
+                    kanjilink.href = `https://www.jisho.org/search/${kanji}%20%23`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
 
@@ -3537,7 +3549,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         a.textContent = link;
                         kanjiboxlink.appendChild(a);
                     });
-
                 }
 
                 // Append kanjiboxlink to outputContainer
@@ -3558,7 +3569,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (line.trim()) {
                 let kanjionlycleaned = line.replace(removenonkanji, '');
                 kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join('');
-
 
                 const titlebox = document.createElement('div');
                 titlebox.classList.add('titlelinks');
@@ -3620,18 +3630,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 const mainlink = document.createElement('a');
-                mainlink.href = `https://www.jisho.org/search/${kanjionlycleaned}`;
+                mainlink.href = `https://www.jisho.org/search/${line}`;
                 mainlink.textContent = 'Jisho Link';
                 mainlink.class = 'titlelinks';
                 mainlink.target = '_blank';
 
                 const googletranslatejapanesetoenglish = document.createElement('a');
-                googletranslatejapanesetoenglish.href = `https://translate.google.com/?sl=ja&tl=en&text=${kanjionlycleaned}`;
+                googletranslatejapanesetoenglish.href = `https://translate.google.com/?sl=ja&tl=en&text=${line}`;
                 googletranslatejapanesetoenglish.textContent = 'Translate';
 
-                titlebox.appendChild(mainlink);
-                titlebox.appendChild(googletranslatejapanesetoenglish);
                 titlebox.appendChild(document.createElement('br'));
+                titlebox.appendChild(document.createElement('br'));
+                titlebox.appendChild(mainlink);
+                titlebox.appendChild(document.createElement('br'));
+                titlebox.appendChild(googletranslatejapanesetoenglish);
+                const spacenode = document.createTextNode('    ');
+                titlebox.appendChild(spacenode);
                 outputContainer.appendChild(titlebox);
                 titlebox.appendChild(document.createElement('br'));
 
