@@ -3390,18 +3390,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function cleanUserInput() {
-        // Get the value from the textarea
         let inputText = userInput.value.trim();
         inputText = inputText.replace(removeleadingnonjapanese, '');
         inputText = inputText.replace(eliminateLeadingSpaces, '');
         inputText = inputText.replace(eliminateUnwantedWords, '');
 
-        // Split into tokenized words (lines)
         return inputText.split('\n');
     }
 
     async function createkanjiboxes(kanjionlycleaned) {
         for (let kanji of kanjionlycleaned) {
+            let kanjiboxlink = document.createElement('div');
+            kanjiboxlink.classList.add('box');
+            
+            let kanjiTextNode = document.createTextNode(kanji);
+
             let currentkanji = kanji.trim();
             let kanjiimportant = "";
             let kanjidefinitions = "";
@@ -3414,140 +3417,208 @@ document.addEventListener('DOMContentLoaded', function() {
                 kanjiimportant = definitionsmap.get(currentkanji).split('*');
 
                 if (kanjiimportant[0] === "Both") {
-                    onyomireadings = kanjiimportant[1];
+                    onyomireadings = document.createTextNode(kanjiimportant[1]);
                     onyomifrequency = kanjiimportant[2];
                     kunyomireadings = kanjiimportant[3].split('、');
                     kunyomifrequency = kanjiimportant[4];
-                    kanjidefinitions = kanjiimportant[5];
-                    kanjidefinitions = kanjidefinitions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
+                    let kanjidefinitiontext = kanjiimportant[5].charAt(0).toUpperCase() + kanjiimportant[5].slice(1);
+                    let kanjidefinitions = document.createTextNode(kanjidefinitiontext);
+                    
+                    let kanjilink = document.createElement('a');
+                    kanjilink.class = 'kanjilink';
+                    kanjilink.href = `https://www.jisho.org/search/${kanji}`;
+                    kanjilink.target = '_blank';
+                    kanjilink.textContent = kanji;
 
-                    kunyomireadings = kunyomireadings.map(link => {
-                        return `<a href="https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}" target="_blank">${link}</a>`;
+                    let onyomiTag = document.createTextNode('Onyomi');
+                    let onyomiCount = document.createTextNode(`(${onyomifrequency})`);
+                    let kunyomiTag = document.createTextNode('Kunyomi');
+                    let kunyomiCount = document.createTextNode(`(${kunyomifrequency})`)
+
+                    kanjiboxlink.appendChild(kanjilink);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(kanjidefinitions);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(onyomiTag);
+                    kanjiboxlink.appendChild(document.createTextNode('    '));
+                    kanjiboxlink.appendChild(onyomiCount);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+
+
+                    kanjiboxlink.appendChild(onyomireadings);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(kunyomiTag);
+                    kanjiboxlink.appendChild(kunyomiCount);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+
+                    kunyomireadings.forEach(link => {
+                        let a = document.createElement('a');
+                        a.href = `https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}`;
+                        a.target = '_blank';
+                        a.textContent = link;
+                        kanjiboxlink.appendChild(a);
                     });
 
-                    kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})<br>Kun: ${kunyomireadings} (${kunyomifrequency})`;
                 } else if (kanjiimportant[0] === "Onyomi") {
                     onyomireadings = kanjiimportant[1].split('、');
                     onyomifrequency = kanjiimportant[2];
                     kanjidefinitions = kanjiimportant[3];
                     kanjidefinitions = kanjidefinitions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
-                    kanjiimportant = `On: ${onyomireadings} (${onyomifrequency})`;
-                } else if (kanjiimportant[0] === "Kun") {
+
+                    let kanjilink = document.createElement('a');
+                    kanjilink.class = 'kanjilink';
+                    kanjilink.href = `https://www.jisho.org/search/${kanji}`;
+                    kanjilink.target = '_blank';
+                    kanjilink.textContent = kanji;
+
+                    let onyomiCount = document.createTextNode(`(${onyomifrequency})`)
+                    let onyomiTag = document.createTextNode('Onyomi');
+                    kanjiboxlink.appendChild(kanjilink);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(onyomiTag);
+                    kanjiboxlink.appendChild(onyomiCount);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    
+                    onyomireadings.forEach(link => {
+                        let a = document.createElement('a');
+                        a.href = `https://www.jisho.org/search/${currentkanji}%20%23kanji`;
+                        a.target = '_blank';
+                        a.textContent = link;
+                        kanjiboxlink.appendChild(a);
+                    });
+
+                } else if (kanjiimportant[0] === "Kunyomi") {
                     kunyomireadings = kanjiimportant[1].split('、');
                     kunyomifrequency = kanjiimportant[2];
                     kanjidefinitions = kanjiimportant[3];
                     kanjidefinitions = kanjidefinitions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
                     kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
+
+                    let kanjilink = document.createElement('a');
+                    kanjilink.class = 'kanjilink';
+                    kanjilink.href = `https://www.jisho.org/search/${kanji}`;
+                    kanjilink.target = '_blank';
+                    kanjilink.textContent = kanji;
+
+                    let kunyomiCount = document.createTextNode(`(${kunyomifrequency})`)
+                    let kunyomiTag = document.createTextNode('Kunyomi');
+                    kanjiboxlink.appendChild(kanjilink);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(kunyomiTag);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(kunyomiCount);
+                    
+                    kunyomireadings.forEach(link => {
+                        let a = document.createElement('a');
+                        a.href = `https://www.jisho.org/search/${currentkanji}%20%23kanji`;
+                        a.target = '_blank';
+                        a.textContent = link;
+                        kanjiboxlink.appendChild(a);
+                    });
+
                 }
-            }
 
-            let combinedoutput = `<br><a href="https://www.jisho.org/search/${currentkanji}%20%23kanji" target="_blank" class = "kanjilink">${currentkanji}</a><br>${kanjidefinitions}<br>${kanjiimportant}`;
-
-            const newOutputBox = document.createElement('div');
-            newOutputBox.classList.add('box');
-            newOutputBox.innerHTML = combinedoutput;
-
-            outputContainer.appendChild(newOutputBox);
-        }
-    }
-
-    async function createtooltips(line) {
-        let originalpassagewithlinks = [];
-
-        for (let kanji of line) {
-            let currentkanjiinlink = kanji.trim();
-            let kunyomiCount = 0;
-            let onyomiCount = 0;
-            let onyomireadings = "";
-            let kunyomireadings = "";
-            let kanjidefinitions = "";
-
-            if (isakanji.test(currentkanjiinlink)) {
-                if (definitionsmap && definitionsmap.has(currentkanjiinlink)) {
-                    let currentdefinition = definitionsmap.get(currentkanjiinlink);
-
-                    if (definitionsmap && definitionsmap.has(currentkanjiinlink)) {
-                        let kanjiinformation = definitionsmap.get(currentkanjiinlink).split('*');
-                        let kanjiType = kanjiinformation[0];
-
-                        if (kanjiType === "Both") {
-                            onyomireadings = kanjiinformation[1];
-                            kunyomireadings = kanjiinformation[3];
-                            onyomiCount = kanjiinformation[2];
-                            kunyomiCount = kanjiinformation[4];
-                            kanjidefinitions = kanjiinformation[5];
-                        } else if (kanjiType === "Onyomi") {
-                            onyomireadings = kanjiinformation[1];
-                            onyomiCount = kanjiinformation[2];
-                            kanjidefinitions = kanjiinformation[3];
-                        } else if (kanjiType === "Kunyomi") {
-                            kunyomireadings = kanjiinformation[1];
-                            kunyomiCount = kanjiinformation[2];
-                            kanjidefinitions = kanjiinformation[3];
-                        }
-                    }
-
-                    kanjidefinitions = kanjidefinitions.charAt(0).toUpperCase() + kanjidefinitions.slice(1);
-
-                    let currentdefinitionlinked = `<span class='tooltip'><a href = \"https://www.jisho.org/search/${currentkanjiinlink}%20%23kanji\" target = \"_blank\" class = \"link1\">${currentkanjiinlink}</a><span class='tooltip-text'>${kanjidefinitions}<br>音: ${onyomiCount} <br>訓: ${kunyomiCount} </span></span>`;
-                    originalpassagewithlinks.push(currentdefinitionlinked);
-                } else {
-                    originalpassagewithlinks.push("No Definition Found");
-                }
-            } else {
-                originalpassagewithlinks.push(currentkanjiinlink);
+                // Append kanjiboxlink to outputContainer
+                outputContainer.appendChild(kanjiboxlink);
             }
         }
-
-        return originalpassagewithlinks.join('');
     }
 
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
         outputContainer.innerHTML = ''; // Clear previous output
+        currentIndex = 0; // Reset current index
+        outputContainersHTML.length = 0; // Clear outputContainersHTML array
 
-        buttonindex = 0;
-        buttonindex = buttonindex + 1;
-        
         const tokenizedWords = await cleanUserInput();
 
-        // Create new elements for the output
         for (let line of tokenizedWords) {
             if (line.trim()) {
                 let kanjionlycleaned = line.replace(removenonkanji, '');
-                kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join(''); // Remove duplicates
+                kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join('');
 
-                let originallinkjoined = await createtooltips(line);
 
-                let jishourlcontent = "";
-                let googlechromecontent = "";
+                const titlebox = document.createElement('div');
+                titlebox.classList.add('titlelinks');
 
-                if (line.length > 450) {
-                    navigator.clipboard.writeText(line);
-                    jishourlcontent = "Your text was copied in here. Paste in to Jisho to get it all.";
-                } else {
-                    jishourlcontent = line;
+                for(let kanji of line) {
+                    if (kanji.match(isakanji)) {
+                        let kanjitype = "";
+                        let defintion = "";
+                        let onyomifrequency = "";
+                        let kunyomifrequency = "";
+                        let importantinformation = document.createTextNode('');
+
+                        const outerspan = document.createElement('span');
+                        outerspan.classList.add('tooltip');
+                    
+                        const actualText = document.createTextNode(kanji);
+                        outerspan.appendChild(actualText);
+
+
+                        if (definitionsmap.has(kanji)) {
+                            const innerspan = document.createElement('span');
+                            innerspan.classList.add('tooltip-text');
+                            kanjitype = definitionsmap.get(kanji).split('*');
+
+                            if (kanjitype[0] === "Onyomi") {
+                                definition = kanjitype[3];
+                                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                                onyomifrequency = kanjitype[2];
+                                
+                                innerspan.appendChild(document.createTextNode(definition));
+                                innerspan.appendChild(document.createElement('br'));
+                                innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+                            } else if (kanjitype[0] === "Kunyomi") {
+                                definition = kanjitype[3];
+                                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                                kunyomifrequency = kanjitype[2];
+                                innerspan.appendChild(document.createTextNode(definition));
+                                innerspan.appendChild(document.createElement('br'));
+                                innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+                            } else if (kanjitype[0] === "Both") {
+                                definition = kanjitype[5];
+                                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                                onyomifrequency = kanjitype[2];
+                                kunyomifrequency = kanjitype[4];
+                                innerspan.appendChild(document.createTextNode(definition));
+                                innerspan.appendChild(document.createElement('br'));
+                                innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+                                innerspan.appendChild(document.createElement('br'));
+                                innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+                            }
+                            
+                            outerspan.appendChild(innerspan);
+                            titlebox.appendChild(outerspan);
+                        }
+                    } else {
+                        const actualText = document.createTextNode(kanji);
+                        titlebox.appendChild(actualText);
+                    }
                 }
 
-                if(line > 3500) {
-                    navigator.clipboard.writeText(line);
-                    googlechromecontent = "Your text was copied in here. Paste it into google translate for it to work.";
-                } else {
-                    googlechromecontent = encodeURIComponent(line);
-                }
-                
-                const exampleWithLinks = `${originallinkjoined}<br><br><a href="https://www.jisho.org/search/${jishourlcontent}" target="_blank">Jisho Link</a>    <a href="https://translate.google.com/?sl=ja&tl=en&text=${googlechromecontent}&op=translate" target="_blank">Translate</a>    <button id = "gptButton">Chat GPT</button>`;
+                const mainlink = document.createElement('a');
+                mainlink.href = `https://www.jisho.org/search/${kanjionlycleaned}`;
+                mainlink.textContent = 'Jisho Link';
+                mainlink.class = 'titlelinks';
+                mainlink.target = '_blank';
 
-                const newTitle = document.createElement('div');
-                newTitle.classList.add('titlelinks');
-                newTitle.innerHTML = exampleWithLinks;
+                const googletranslatejapanesetoenglish = document.createElement('a');
+                googletranslatejapanesetoenglish.href = `https://translate.google.com/?sl=ja&tl=en&text=${kanjionlycleaned}`;
+                googletranslatejapanesetoenglish.textContent = 'Translate';
 
-                outputContainer.appendChild(newTitle);
+                titlebox.appendChild(mainlink);
+                titlebox.appendChild(googletranslatejapanesetoenglish);
+                titlebox.appendChild(document.createElement('br'));
+                outputContainer.appendChild(titlebox);
+                titlebox.appendChild(document.createElement('br'));
+
 
                 await createkanjiboxes(kanjionlycleaned);
             }
         }
 
+        // Store current state of outputContainer
         outputContainersHTML[currentIndex] = outputContainer.innerHTML;
         currentIndex++;
         userInput.value = ''; // Clear input field
