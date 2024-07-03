@@ -2095,7 +2095,7 @@ async function populateMapsAsync() {
 				transativitymap.set('高い','iAdj*High; tall*たかい');
 				transativitymap.set('黒い','iAdj*Black*くろい');
 				transativitymap.set('追いつく','Intransative*To catch up with*おいつく');
-				transativitymap.set('大いに','adverb*Greatly; much*おおいに');
+				transativitymap.set('大いに','Adverb*Greatly; much*おおいに');
 				transativitymap.set('報いる','Transative*To repay; to reward*むくいる');
 				transativitymap.set('強いる','Transative*To advise; to admonish*しいる');
 				transativitymap.set('悔いる','Transative*To eat; to bite*くいる');
@@ -2498,7 +2498,7 @@ async function populateMapsAsync() {
 				transativitymap.set('混ざる','Intransative*to be mixed、 to be blended*まざる');
 				transativitymap.set('但し','conjunction*however、 but*ただし');
 				transativitymap.set('兆し','Noun*sign、 omen*きざし');
-				transativitymap.set('少し','adverb*a little、 a bit*すこし');
+				transativitymap.set('少し','Adverb*a little、 a bit*すこし');
 				transativitymap.set('久しい','iAdj*long （time）、 old （friend）*ひさしい');
 				transativitymap.set('乏しい','iAdj*poor、 scarce*とぼしい');
 				transativitymap.set('優しい','iAdj*kind、 gentle*やさしい');
@@ -2637,7 +2637,7 @@ async function populateMapsAsync() {
 				transativitymap.set('揺すぶる','Transative*to shake、 to jostle*ゆすぶる');
 				transativitymap.set('揺する','Transative*to shake、 to sway*ゆする');
 				transativitymap.set('欲する','Transative*to desire、 to crave*ほっする');
-				transativitymap.set('必ず','adverb*certainly、 without fail*かならず');
+				transativitymap.set('必ず','Adverb*certainly、 without fail*かならず');
 				transativitymap.set('恥ずかしい','iAdj*embarrassing、 shameful*はずかしい');
 				transativitymap.set('仰せ','Noun*command、 instruction （humble form）*おほせ');
 				transativitymap.set('幸せ','Noun*happiness、 bliss*しあわせ');
@@ -2660,10 +2660,10 @@ async function populateMapsAsync() {
 				transativitymap.set('慌ただしい','iAdj*hectic、 busy*あわただしい');
 				transativitymap.set('当たる','Intransative*to hit、 to strike*あたる');
 				transativitymap.set('隔たる','Intransative*distant、 isolated*へだたる');
-				transativitymap.set('甚だ','adverb*very、 exceedingly*はなはだ');
+				transativitymap.set('甚だ','Adverb*very、 exceedingly*はなはだ');
 				transativitymap.set('甚だしい','iAdj*extreme、 excessive*はなはだしい');
 				transativitymap.set('過ち','Noun*mistake、 error*あやまち');
-				transativitymap.set('直ちに','adverb*immediately、 at once*ただちに');
+				transativitymap.set('直ちに','Adverb*immediately、 at once*ただちに');
 				transativitymap.set('朽ちる','Intransative*to decay、 to rot*くちる');
 				transativitymap.set('満ちる','Intransative*to be filled、 to be full*みちる');
 				transativitymap.set('落ちる','Intransative*to fall、 to drop*おちる');
@@ -2681,18 +2681,18 @@ async function populateMapsAsync() {
 				transativitymap.set('四つ','numeric*four*よつ');
 				transativitymap.set('建つ','Intransative*to be built、 to stand*たつ');
 				transativitymap.set('待つ','Intransative*to wait、 to await*まつ');
-				transativitymap.set('打つ','trans*to hit、 to strike*うつ');
-				transativitymap.set('持つ','trans*to hold、 to carry*もつ');
-				transativitymap.set('撃つ','trans*to shoot、 to attack*うつ');
-				transativitymap.set('放つ','trans*to release、 to emit*はなつ');
-				transativitymap.set('断つ','trans*to sever、 to cut off*たつ');
+				transativitymap.set('打つ','Transative*to hit、 to strike*うつ');
+				transativitymap.set('持つ','Transative*to hold、 to carry*もつ');
+				transativitymap.set('撃つ','Transative*to shoot、 to attack*うつ');
+				transativitymap.set('放つ','Transative*to release、 to emit*はなつ');
+				transativitymap.set('断つ','Transative*to sever、 to cut off*たつ');
 				transativitymap.set('立つ','Intransative*to stand、 to rise*たつ');
-				transativitymap.set('絶つ','trans*to sever、 to cut off*たつ');
-				transativitymap.set('育つ','trans*to grow、 to be brought up*そだつ');
+				transativitymap.set('絶つ','Transative*to sever、 to cut off*たつ');
+				transativitymap.set('育つ','Transative*to grow、 to be brought up*そだつ');
 				transativitymap.set('裁つ','Intransative*to cut、 to tailor*たつ');
-				transativitymap.set('討つ','trans*to attack、 to defeat*うつ');
+				transativitymap.set('討つ','Transative*to attack、 to defeat*うつ');
 				transativitymap.set('過つ','Intransative*to err、 to make a mistake*たつ');
-				transativitymap.set('全て','adverb*everything、 all*すべて');
+				transativitymap.set('全て','Adverb*everything、 all*すべて');
 				transativitymap.set('果て','Noun*end、 limit*はて');
 				transativitymap.set('企てる','Transative*to plan、 to scheme*くわだてる');
 				transativitymap.set('充てる','Transative*to assign、 to allocate*あてる');
@@ -2714,7 +2714,7 @@ async function populateMapsAsync() {
 				transativitymap.set('損なう','Transative*to harm、 to damage*そこなう');
 				transativitymap.set('連なる','Intransative*to be in a row、 to be connected*つらなる');
 				transativitymap.set('重なる','Intransative*to pile up、 to overlap*かさなる');
-				transativitymap.set('既に','adverb*already、 by now*すでに');
+				transativitymap.set('既に','Adverb*already、 by now*すでに');
 				transativitymap.set('死ぬ','Intransative*to die、 to pass away*しぬ');
 				transativitymap.set('兼ねる','Transative*to hold two or more positions、 to be capable of*かねる');
 				transativitymap.set('委ねる','Transative*to entrust、 to hand over*ゆだねる');
@@ -2724,12 +2724,12 @@ async function populateMapsAsync() {
 				transativitymap.set('跳ねる','Intransative*to jump、 to leap*はねる');
 				transativitymap.set('連ねる','Transative*to line up、 to arrange in a row*つらねる');
 				transativitymap.set('重ねる','Transative*to pile up、 to layer*かさねる');
-				transativitymap.set('半ば','adverb*halfway、 middle*なかば');
+				transativitymap.set('半ば','Adverb*halfway、 middle*なかば');
 				transativitymap.set('伸ばす','Transative*to extend、 to stretch out*のばす');
 				transativitymap.set('延ばす','Transative*to postpone、 to prolong*のばす');
 				transativitymap.set('飛ばす','Transative*to send flying、 to skip*とばす');
 				transativitymap.set('忍ばせる','Transative*to conceal、 to hide*しのばせる');
-				transativitymap.set('再び','adverb*again、 once more*ふたたび');
+				transativitymap.set('再び','Adverb*again、 once more*ふたたび');
 				transativitymap.set('及び','conjunction*and、 as well as*および');
 				transativitymap.set('浴びせる','Transative*to pour、 to splash （liquid）*あびせる');
 				transativitymap.set('並びに','conjunction*as well as、 along with*ならびに');
@@ -3454,6 +3454,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         let splitlink = "";
                         let fullword = "";
                         let secondword = "";
+                        let transplit = "";
+
 
                         if(link.includes('－')) {
                             splitlink = link.split('－');
@@ -3468,7 +3470,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         let a = document.createElement('a');
                         a.href = `https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}`;
                         if (transativitymap.has(fullword)) {
-                            let transplit = transativitymap.get(fullword);
+                            transplit = transativitymap.get(fullword);
 
                             transplit = transplit.split('*');
                             if (transplit[0] === 'Transative') {
@@ -3489,7 +3491,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         a.target = '_blank';
                         a.textContent = transtype;
-                        kanjiboxlink.appendChild(a);
+
+                        const outerspan = document.createElement('span');
+                        outerspan.classList.add('tooltip');
+                        outerspan.appendChild(a);
+
+                        const innerspan = document.createElement('span');
+                        innerspan.classList.add('tooltip-text');
+
+                        innerspan.textContent = transplit[1];
+
+
+                        outerspan.appendChild(innerspan);
+                        
+                        kanjiboxlink.appendChild(outerspan);
                         kanjiboxlink.appendChild(document.createElement('br'));
                     });
 
@@ -3508,6 +3523,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     let onyomiCount = document.createTextNode(`(${onyomifrequency})`)
                     let onyomiTag = document.createTextNode('Onyomi');
                     kanjiboxlink.appendChild(kanjilink);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(document.createTextNode(kanjidefinitions));
                     kanjiboxlink.appendChild(document.createElement('br'));
                     kanjiboxlink.appendChild(onyomiTag);
                     kanjiboxlink.appendChild(onyomiCount);
@@ -3537,6 +3554,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     let kunyomiCount = document.createTextNode(`(${kunyomifrequency})`)
                     let kunyomiTag = document.createTextNode('Kunyomi');
                     kanjiboxlink.appendChild(kanjilink);
+                    kanjiboxlink.appendChild(document.createElement('br'));
+                    kanjiboxlink.appendChild(document.createTextNode(kanjidefinitions));
                     kanjiboxlink.appendChild(document.createElement('br'));
                     kanjiboxlink.appendChild(kunyomiTag);
                     kanjiboxlink.appendChild(document.createElement('br'));
@@ -3629,15 +3648,46 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                const mainlink = document.createElement('a');
-                mainlink.href = `https://www.jisho.org/search/${line}`;
+                const mainlink = document.createElement('button');
                 mainlink.textContent = 'Jisho Link';
-                mainlink.class = 'titlelinks';
-                mainlink.target = '_blank';
+                mainlink.style.backgroundColor = 'black';
+                mainlink.style.color = 'white';
 
-                const googletranslatejapanesetoenglish = document.createElement('a');
-                googletranslatejapanesetoenglish.href = `https://translate.google.com/?sl=ja&tl=en&text=${line}`;
+                mainlink.onclick = function() {
+                    if(line.length > 450) { 
+                        navigator.clipboard.writeText(line);
+                        line = "Paste Text Here."
+                        window.open(`https://www.jisho.org/search/${line}`);
+                    } else {
+                        window.open(`https://www.jisho.org/search/${line}`);
+                    }
+                }
+
+                const googletranslatejapanesetoenglish = document.createElement('button');
                 googletranslatejapanesetoenglish.textContent = 'Translate';
+                googletranslatejapanesetoenglish.style.backgroundColor = 'black';
+                googletranslatejapanesetoenglish.style.color = 'white';
+
+                googletranslatejapanesetoenglish.onclick = function() {
+                    if(line.length > 3500) { 
+                        navigator.clipboard.writeText(line);
+                        line = "Paste Text Here."
+                        window.open(`https://translate.google.com/?sl=ja&tl=en&text=${line}`);
+                    } else {
+                        window.open(`https://translate.google.com/?sl=ja&tl=en&text=${line}`);
+                    }
+                }
+
+                const chatgpt = document.createElement('button');
+                chatgpt.textContent = 'Chat GPT';
+                chatgpt.style.backgroundColor = 'black';
+                chatgpt.style.color = 'white';
+
+                chatgpt.onclick = function() {
+                    line = `Can you break down the grammar piece by piece of the following text, with explanations in english. I want it super broken down, so if necessary, would you be able to limit piece by piece by prompting continue to each. I mean i want things like the particles, verbs, and all components making up the grammar. ${line}`; 
+                    navigator.clipboard.writeText(line);
+                    window.open(`https://www.chatgpt.com/`);
+                }
 
                 titlebox.appendChild(document.createElement('br'));
                 titlebox.appendChild(document.createElement('br'));
@@ -3646,6 +3696,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 titlebox.appendChild(googletranslatejapanesetoenglish);
                 const spacenode = document.createTextNode('    ');
                 titlebox.appendChild(spacenode);
+                titlebox.appendChild(document.createElement('br'));
+                titlebox.appendChild(chatgpt);
                 outputContainer.appendChild(titlebox);
                 titlebox.appendChild(document.createElement('br'));
 
