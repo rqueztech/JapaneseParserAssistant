@@ -3394,13 +3394,18 @@ document.addEventListener('DOMContentLoaded', function() {
         inputText = inputText.replace(eliminateLeadingSpaces, '');
         inputText = inputText.replace(eliminateUnwantedWords, '');
 
+        console.log(inputText);
+
         return inputText.split('\n');
     }
 
     async function createkanjiboxes(kanjionlycleaned) {
         for (let kanji of kanjionlycleaned) {
+            let boxid = kanji;
+
             let kanjiboxlink = document.createElement('div');
             kanjiboxlink.classList.add('box');
+            kanjiboxlink.id = boxid;
             
             let kanjiTextNode = document.createTextNode(kanji);
 
@@ -3411,6 +3416,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let onyomifrequency = "";
             let kunyomireadings = "";
             let kunyomifrequency = "";
+            let root = "";
 
             if (definitionsmap && definitionsmap.has(currentkanji)) {
                 kanjiimportant = definitionsmap.get(currentkanji).split('*');
@@ -3488,6 +3494,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         } else {
                             transtype = fullword + ' Root';
+                            root = fullword;
                         }
                         a.target = '_blank';
                         a.textContent = transtype;
@@ -3576,6 +3583,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
         outputContainer.innerHTML = ''; // Clear previous output
@@ -3583,127 +3591,196 @@ document.addEventListener('DOMContentLoaded', function() {
         outputContainersHTML.length = 0; // Clear outputContainersHTML array
 
         const tokenizedWords = await cleanUserInput();
-
+        let currentposition = 0;
+        let currentcount = 0;
+        
         for (let line of tokenizedWords) {
-            if (line.trim()) {
-                let kanjionlycleaned = line.replace(removenonkanji, '');
-                kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join('');
+            currentcount = 0;
 
-                const titlebox = document.createElement('div');
-                titlebox.classList.add('titlelinks');
+            let kanjionlycleaned = line.replace(removenonkanji, '');
+            kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join('');
 
-                for(let kanji of line) {
-                    if (kanji.match(isakanji)) {
-                        let kanjitype = "";
-                        let defintion = "";
-                        let onyomifrequency = "";
-                        let kunyomifrequency = "";
-                        let importantinformation = document.createTextNode('');
+            let currentlinemax = line.length - 1;
+            let mostlikely = "";
 
-                        const outerspan = document.createElement('span');
-                        outerspan.classList.add('tooltip');
-                    
-                        const actualText = document.createTextNode(kanji);
-                        outerspan.appendChild(actualText);
+            const titlebox = document.createElement('div');
+            titlebox.classList.add('titlelinks');
 
+            for(let kanji of line) {
+                const locallink = document.createElement('a');
+                locallink.href = `#${kanji}`;
+                locallink.textContent = kanji;
 
-                        if (definitionsmap.has(kanji)) {
-                            const innerspan = document.createElement('span');
-                            innerspan.classList.add('tooltip-text');
-                            kanjitype = definitionsmap.get(kanji).split('*');
+                if (kanji.match(isakanji)) {
+                    let kanjitype = "";
+                    let defintion = "";
+                    let onyomifrequency = "";
+                    let kunyomifrequency = "";
+                    let onyomireadings = "";
+                    let kunyoimreadings = "";
+                    let importantinformation = document.createTextNode('');
 
-                            if (kanjitype[0] === "Onyomi") {
-                                definition = kanjitype[3];
-                                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                                onyomifrequency = kanjitype[2];
-                                
-                                innerspan.appendChild(document.createTextNode(definition));
-                                innerspan.appendChild(document.createElement('br'));
-                                innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
-                            } else if (kanjitype[0] === "Kunyomi") {
-                                definition = kanjitype[3];
-                                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                                kunyomifrequency = kanjitype[2];
-                                innerspan.appendChild(document.createTextNode(definition));
-                                innerspan.appendChild(document.createElement('br'));
-                                innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
-                            } else if (kanjitype[0] === "Both") {
-                                definition = kanjitype[5];
-                                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                                onyomifrequency = kanjitype[2];
-                                kunyomifrequency = kanjitype[4];
-                                innerspan.appendChild(document.createTextNode(definition));
-                                innerspan.appendChild(document.createElement('br'));
-                                innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
-                                innerspan.appendChild(document.createElement('br'));
-                                innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
-                            }
-                            
-                            outerspan.appendChild(innerspan);
-                            titlebox.appendChild(outerspan);
+                    const outerspan = document.createElement('span');
+                    outerspan.classList.add('tooltip');
+                
+                    outerspan.appendChild(locallink);
+
+                    if (currentcount === 0 && currentlinemax === 1) {
+                        mostlikely = "Onyomi";
+                    }
+                    else if (currentcount === 0 && currentlinemax > 1) {
+                        if (line[currentcount + 1].match(isakanji)) {
+                            mostlikely = "Onyomi";
+                        } else {
+                            mostlikely = "Kunyomi";
+                        }
+                    }
+                    else if (currentcount > 0 && currentcount < currentlinemax) {
+                        if (line[currentcount - 1].match(isakanji) || line[currentcount + 1].match(isakanji)) {
+                            mostlikely = "Onyomi";
+                        } else {
+                            mostlikely = "Kunyomi";
+                        }
+                    }
+                    else if (currentcount === currentlinemax) {
+                        if (line[currentcount - 1].match(isakanji)) {
+                            mostlikely = "Onyomi";
+                        } else {
+                            mostlikely = "Kunyomi";
                         }
                     } else {
-                        const actualText = document.createTextNode(kanji);
-                        titlebox.appendChild(actualText);
+                        mostlikely = "Edge Case";
                     }
-                }
 
-                const mainlink = document.createElement('button');
-                mainlink.textContent = 'Jisho Link';
-                mainlink.style.backgroundColor = 'black';
-                mainlink.style.color = 'white';
+                    if (definitionsmap.has(kanji)) {
+                        const innerspan = document.createElement('span');
+                        innerspan.classList.add('tooltip-text');
+                        kanjitype = definitionsmap.get(kanji).split('*');
 
-                mainlink.onclick = function() {
-                    if(line.length > 450) { 
-                        navigator.clipboard.writeText(line);
-                        line = "Paste Text Here."
-                        window.open(`https://www.jisho.org/search/${line}`);
-                    } else {
-                        window.open(`https://www.jisho.org/search/${line}`);
+                        if (kanjitype[0] === "Onyomi") {
+                            definition = kanjitype[3];
+                            definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                            onyomifrequency = kanjitype[2];
+                            onyomireadings = kanjitype[1];
+                            
+                            innerspan.appendChild(document.createTextNode('Onyomi'));
+                            innerspan.appendChild(document.createElement('br'));
+                            if(onyomifrequency === "1") {
+                                innerspan.appendChild(document.createTextNode(onyomireadings));
+                                innerspan.appendChild(document.createElement('br'));
+                            }
+                            innerspan.appendChild(document.createTextNode(definition));
+                            innerspan.appendChild(document.createElement('br'));
+                            innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+                        } else if (kanjitype[0] === "Kunyomi") {
+                            definition = kanjitype[3];
+                            definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                            kunyomifrequency = kanjitype[2];
+                            kunyomireadings = kanjitype[1];
+                            innerspan.appendChild(document.createTextNode('Kunyomi'));
+                            innerspan.appendChild(document.createElement('br'));
+                            if(kunyomifrequency === "1") {
+                                innerspan.appendChild(document.createTextNode(kunyomireadings));
+                                innerspan.appendChild(document.createElement('br'));
+                            }
+                            innerspan.appendChild(document.createTextNode(definition));
+                            innerspan.appendChild(document.createElement('br'));
+                            innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+                        } else if (kanjitype[0] === "Both") {
+                            definition = kanjitype[5];
+                            definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                            onyomifrequency = kanjitype[2];
+                            onyomireadings = kanjitype[1];
+                            kunyomifrequency = kanjitype[4];
+                            kunyoimreadings = kanjitype[3];
+                            innerspan.appendChild(document.createTextNode(mostlikely));
+                            console.log("MOST ---> ", mostlikely, line[currentcount]);
+                            innerspan.appendChild(document.createElement('br'));
+                            if(mostlikely === "Onyomi" && onyomifrequency === "1") {
+                                innerspan.appendChild(document.createTextNode(onyomireadings));
+                                innerspan.appendChild(document.createElement('br'));
+                            } else if (mostlikely === "Kunyomi" && kunyomifrequency === "1") {
+                                innerspan.appendChild(document.createTextNode(kunyoimreadings));
+                                innerspan.appendChild(document.createElement('br'));
+                            }
+                            innerspan.appendChild(document.createTextNode(definition));
+                            innerspan.appendChild(document.createElement('br'));
+                            innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+                            innerspan.appendChild(document.createElement('br'));
+                            innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+                        }
+                        
+                        outerspan.appendChild(innerspan);
+                        titlebox.appendChild(outerspan);
                     }
+                } else {
+                    const actualText = document.createTextNode(kanji);
+                    titlebox.appendChild(actualText);
                 }
 
-                const googletranslatejapanesetoenglish = document.createElement('button');
-                googletranslatejapanesetoenglish.textContent = 'Translate';
-                googletranslatejapanesetoenglish.style.backgroundColor = 'black';
-                googletranslatejapanesetoenglish.style.color = 'white';
-
-                googletranslatejapanesetoenglish.onclick = function() {
-                    if(line.length > 3500) { 
-                        navigator.clipboard.writeText(line);
-                        line = "Paste Text Here."
-                        window.open(`https://translate.google.com/?sl=ja&tl=en&text=${line}`);
-                    } else {
-                        window.open(`https://translate.google.com/?sl=ja&tl=en&text=${line}`);
-                    }
-                }
-
-                const chatgpt = document.createElement('button');
-                chatgpt.textContent = 'Chat GPT';
-                chatgpt.style.backgroundColor = 'black';
-                chatgpt.style.color = 'white';
-
-                chatgpt.onclick = function() {
-                    line = `Can you break down the grammar piece by piece of the following text, with explanations in english. I want it super broken down, so if necessary, would you be able to limit piece by piece by prompting continue to each. I mean i want things like the particles, verbs, and all components making up the grammar. ${line}`; 
-                    navigator.clipboard.writeText(line);
-                    window.open(`https://www.chatgpt.com/`);
-                }
-
-                titlebox.appendChild(document.createElement('br'));
-                titlebox.appendChild(document.createElement('br'));
-                titlebox.appendChild(mainlink);
-                titlebox.appendChild(document.createElement('br'));
-                titlebox.appendChild(googletranslatejapanesetoenglish);
-                const spacenode = document.createTextNode('    ');
-                titlebox.appendChild(spacenode);
-                titlebox.appendChild(document.createElement('br'));
-                titlebox.appendChild(chatgpt);
-                outputContainer.appendChild(titlebox);
-                titlebox.appendChild(document.createElement('br'));
-
-
-                await createkanjiboxes(kanjionlycleaned);
+                currentcount++;
+                currentposition++;
             }
+
+            const mainlink = document.createElement('button');
+            mainlink.textContent = 'Jisho Link';
+            mainlink.style.backgroundColor = 'black';
+            mainlink.style.color = 'white';
+
+            const jishotext = line;
+
+            mainlink.onclick = function() {
+                if(line.length > 450) { 
+                    navigator.clipboard.writeText(line);
+                    jishotext = "Paste Text Here."
+                    window.open(`https://www.jisho.org/search/${jishotext}`);
+                } else {
+                    window.open(`https://www.jisho.org/search/${line}`);
+                }
+            }
+
+            const googletranslatejapanesetoenglish = document.createElement('button');
+            googletranslatejapanesetoenglish.textContent = 'Translate';
+            googletranslatejapanesetoenglish.style.backgroundColor = 'black';
+            googletranslatejapanesetoenglish.style.color = 'white';
+
+            const googletext = "";
+
+            googletranslatejapanesetoenglish.onclick = function() {
+                if(line.length > 5000) { 
+                    navigator.clipboard.writeText(line);
+                    googletext = "Paste Text Here."
+                    window.open(`https://translate.google.com/?sl=ja&tl=en&text=${googletext}`);
+                } else {
+                    window.open(`https://translate.google.com/?sl=ja&tl=en&text=${line}`);
+                }
+            }
+
+            const chatgpt = document.createElement('button');
+            chatgpt.textContent = 'Chat GPT';
+            chatgpt.style.backgroundColor = 'black';
+            chatgpt.style.color = 'white';
+
+            chatgpt.onclick = function() {
+                chatgptprompt = `Can you break down the grammar piece by piece of the following text, with explanations in english. I want it super broken down, so if necessary, would you be able to limit piece by piece by prompting continue to each. I mean i want things like the particles, verbs, and all components making up the grammar. ${line}`; 
+                navigator.clipboard.writeText(chatgptprompt);
+                window.open(`https://www.chatgpt.com/`);
+            }
+
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(mainlink);
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(googletranslatejapanesetoenglish);
+            const spacenode = document.createTextNode('    ');
+            titlebox.appendChild(spacenode);
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(chatgpt);
+            outputContainer.appendChild(titlebox);
+            titlebox.appendChild(document.createElement('br'));
+
+
+            await createkanjiboxes(kanjionlycleaned);
         }
 
         // Store current state of outputContainer
