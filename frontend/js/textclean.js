@@ -3429,8 +3429,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     let kanjidefinitions = document.createTextNode(kanjidefinitiontext);
                     
                     let kanjilink = document.createElement('a');
+                    encodedkanji = encodeURIComponent(kanji);
                     kanjilink.class = 'kanjilink';
-                    kanjilink.href = `https://www.jisho.org/search/${kanji}%20%23kanji`;
+                    kanjilink.href = `https://www.jisho.org/search/${encodedkanji}%20%23kanji`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
 
@@ -3472,8 +3473,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         let transtype = "";
 
+                        encodedkanji = encodeURIComponent(currentkanji);
                         let a = document.createElement('a');
-                        a.href = `https://www.jisho.org/search/${currentkanji}%20${link.replace('－', '')}`;
+                        a.href = `https://www.jisho.org/search/${encodedkanji}%20${link.replace('－', '')}`;
                         if (transativitymap.has(fullword)) {
                             transplit = transativitymap.get(fullword);
 
@@ -3522,7 +3524,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     let kanjilink = document.createElement('a');
                     kanjilink.class = 'kanjilink';
-                    kanjilink.href = `https://www.jisho.org/search/${kanji}%20%23kanji`;
+                    encodedkanji = encodeURIComponent(kanji);
+                    kanjilink.href = `https://www.jisho.org/search/${encodedkanji}%20%23kanji`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
 
@@ -3552,8 +3555,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     kanjiimportant = `Kunyomi: ${kunyomireadings} (${kunyomifrequency})`;
 
                     let kanjilink = document.createElement('a');
+                    encodedkanji = encodeURIComponent(kanji);
                     kanjilink.class = 'kanjilink';
-                    kanjilink.href = `https://www.jisho.org/search/${kanji}%20%23`;
+                    kanjilink.href = `https://www.jisho.org/search/${encodedkanji}%20%23`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
 
@@ -3591,15 +3595,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const tokenizedWords = await cleanUserInput();
         let currentposition = 0;
-        let currentcount = 0;
         
         for (let line of tokenizedWords) {
-            currentcount = 0;
+            currentposition = 0;
 
             let kanjionlycleaned = line.replace(removenonkanji, '');
             kanjionlycleaned = Array.from(new Set(kanjionlycleaned)).join('');
 
-            let currentlinemax = line.length - 1;
+            let currentlinemax = line.length;
             let mostlikely = "";
 
             const titlebox = document.createElement('div');
@@ -3607,7 +3610,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             for(let kanji of line) {
                 const locallink = document.createElement('a');
-                locallink.href = `#${kanji}`;
+                encodedkanji = encodeURIComponent(kanji);
+                locallink.href = `#${encodedkanji}`;
                 locallink.textContent = kanji;
 
                 if (kanji.match(isakanji)) {
@@ -3624,41 +3628,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                     outerspan.appendChild(locallink);
 
-                    if (currentcount === 0 && currentlinemax === 1) {
+                    if (currentlinemax === 1 && currentposition === 0) {
                         mostlikely = "Onyomi";
+                    } else {
+
+                        if (currentposition === 0) {
+                            if(line[currentposition + 1].match(isakanji)) {
+                                mostlikely = "Onyomi";
+                            } else {
+                                mostlikely = "Kunyomi";
+                            }
+                        } else if (currentposition === line.length - 1) {
+                            if(line[currentposition - 1].match(isakanji)) {
+                                mostlikely = "Onyomi";
+                            } else {
+                                mostlikely = "Kunyomi";
+                            }
+                        } else {
+                            if(line[currentposition - 1].match(isakanji) || line[currentposition + 1].match(isakanji)) {
+                                mostlikely = "Onyomi";
+                            } else {
+                                mostlikely = "Kunyomi";
+                            }
+                        }
                     }
 
-                    else if (currentcount === 1 && currentlinemax === 2) {
-                        console.log(kanji)
-                        if (line[currentcount - 1].match(isakanji)) {
-                            mostlikely = "Onyomi";
-                        } else {
-                            mostlikely = "Kunyomi";
-                        }
-                    }
-                    else if (currentcount === 0 && currentlinemax > 1) {
-                        if (line[currentcount + 1].match(isakanji)) {
-                            mostlikely = "Onyomi";
-                        } else {
-                            mostlikely = "Kunyomi";
-                        }
-                    }
-                    else if (currentcount > 0 && currentcount < currentlinemax) {
-                        if (line[currentcount - 1].match(isakanji) || line[currentcount + 1].match(isakanji)) {
-                            mostlikely = "Onyomi";
-                        } else {
-                            mostlikely = "Kunyomi";
-                        }
-                    }
-                    else if (currentcount === currentlinemax && currentlinemax > 1) {
-                        if (line[currentcount - 1].match(isakanji)) {
-                            mostlikely = "Onyomi";
-                        } else {
-                            mostlikely = "Kunyomi";
-                        }
-                    } else {
-                        mostlikely = "Edge Case";
-                    }
 
                     if (definitionsmap.has(kanji)) {
                         const innerspan = document.createElement('span');
@@ -3680,7 +3674,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let splitonyomireadings = onyomireadings.split('、');
                                 let count = 0;
                                 splitonyomireadings.forEach(link => {
-                                    innerspan.appendChild(document.createTextNode(`${++count}. ${line}`));
+                                    innerspan.appendChild(document.createTextNode(`${++count}. ${onyomireadings}`));
                                     innerspan.appendChild(document.createElement('br'));
                                 });
                             }
@@ -3696,8 +3690,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             innerspan.appendChild(document.createElement('br'));
                             if(kunyomifrequency === 1) {
                                 innerspan.appendChild(document.createTextNode(kunyomireadings));
-                                console.log("KunyomiRead --->", kunyomireadings)
                                 innerspan.appendChild(document.createElement('br'));
+                            } else {
+                                let splitkunyomireadings = kanjitype[3].split('、');
+                                let count = 0;
+                                splitkunyomireadings.forEach (link => {
+                                    innerspan.appendChild(document.createTextNode(`${count}. ${link}`));
+                                    innerspan.appendChild(document.createElement(`br`));
+                                });
                             }
                             innerspan.appendChild(document.createTextNode(definition));
                             innerspan.appendChild(document.createElement('br'));
@@ -3707,33 +3707,38 @@ document.addEventListener('DOMContentLoaded', function() {
                             definition = definition.charAt(0).toUpperCase() + definition.slice(1);
                             onyomifrequency = parseInt(kanjitype[2], 10);
                             onyomireadings = kanjitype[1];
-                            kunyomifrequency = parseInt(kanjitype[4], 10);
+                            kunyomifrequency = parseInt(kanjitype[2], 10);
                             kunyomireadings = kanjitype[3];
                             innerspan.appendChild(document.createTextNode(mostlikely));
                             innerspan.appendChild(document.createElement('br'));
-                            if(mostlikely === "Onyomi" && onyomifrequency === 1) {
-                                innerspan.appendChild(document.createTextNode(onyomireadings));
-                                innerspan.appendChild(document.createElement('br'));
-                            } else if (mostlikely === "Kunyomi" && kunyomifrequency === 1) {
-                                innerspan.appendChild(document.createTextNode(kunyoimreadings));
-                                innerspan.appendChild(document.createElement('br'));
+                                
+                            if (mostlikely === "Onyomi") {
+                                let splitonyomireadings = onyomireadings.split('、');
+                                let count = 0;
+                                splitonyomireadings.forEach(link => {
+                                    if (onyomifrequency === 1) {
+                                        innerspan.appendChild(document.createTextNode(link));
+                                    } else if (onyomifrequency > 1) {
+                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                                    }
+                                    innerspan.appendChild(document.createElement('br'));
+                                });
+                            } else if (mostlikely === "Kunyomi") {
+                                let splitkunyomireadings = kunyomireadings.split('、');
+                                let count = 0;
+                                splitkunyomireadings.forEach(link => {
+                                    if (kunyomifrequency === 1) {
+                                        innerspan.appendChild(document.createTextNode(link));
+                                    } else if (kunyomifrequency > 1) {
+                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                                    }
+                                    innerspan.appendChild(document.createElement('br'));
+                                });
                             } else {
-                                if (mostlikely === "Onyomi") {
-                                    let splitonyomireadings = onyomireadings.split('、');
-                                    let count = 0;
-                                    splitonyomireadings.forEach(link => {
-                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
-                                        innerspan.appendChild(document.createElement('br'));
-                                    });
-                                } else if (mostlikely === "Kunyomi") {
-                                    let splitkunyomireadings = kunyomireadings.split('、');
-                                    let count = 0;
-                                    splitkunyomireadings.forEach(link => {
-                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
-                                        innerspan.appendChild(document.createElement('br'));
-                                    });
-                                }
+                                innerspan.appendChild(document.createTextNode('Edge Case'));
+                                innerspan.appendChild(document.createElement('br'));
                             }
+
                             innerspan.appendChild(document.createTextNode(definition));
                             innerspan.appendChild(document.createElement('br'));
                             innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
@@ -3749,7 +3754,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     titlebox.appendChild(actualText);
                 }
 
-                currentcount++;
                 currentposition++;
             }
 
@@ -3758,12 +3762,12 @@ document.addEventListener('DOMContentLoaded', function() {
             mainlink.style.backgroundColor = 'black';
             mainlink.style.color = 'white';
 
-            const jishotext = line;
+            let jishotext = line;
 
             mainlink.onclick = function() {
                 if(line.length > 450) { 
                     navigator.clipboard.writeText(line);
-                    jishotext = "Paste Text Here."
+                    jishotext = encodeURIComponent("Paste Text Here.")
                     window.open(`https://www.jisho.org/search/${jishotext}`);
                 } else {
                     window.open(`https://www.jisho.org/search/${line}`);
@@ -3775,15 +3779,16 @@ document.addEventListener('DOMContentLoaded', function() {
             googletranslatejapanesetoenglish.style.backgroundColor = 'black';
             googletranslatejapanesetoenglish.style.color = 'white';
 
-            const googletext = "";
+            let googletext = "";
 
             googletranslatejapanesetoenglish.onclick = function() {
                 if(line.length > 5000) { 
                     navigator.clipboard.writeText(line);
-                    googletext = "Paste Text Here."
+                    googletext = encodeURIComponent("Paste Text Here.")
                     window.open(`https://translate.google.com/?sl=ja&tl=en&text=${googletext}`);
                 } else {
-                    window.open(`https://translate.google.com/?sl=ja&tl=en&text=${line}`);
+                    googletext = encodeURIComponent(line);
+                    window.open(`https://translate.google.com/?sl=ja&tl=en&text=${googletext}`);
                 }
             }
 
@@ -3791,9 +3796,10 @@ document.addEventListener('DOMContentLoaded', function() {
             chatgpt.textContent = 'Chat GPT';
             chatgpt.style.backgroundColor = 'black';
             chatgpt.style.color = 'white';
+            let gpttext = line;
 
             chatgpt.onclick = function() {
-                chatgptprompt = `Can you break down the grammar piece by piece of the following text, with explanations in english. I want it super broken down, so if necessary, would you be able to limit piece by piece by prompting continue to each. I mean i want things like the particles, verbs, and all components making up the grammar. ${line}`; 
+                chatgptprompt = `Can you break down the grammar piece by piece of the following text, with explanations in english. I want it super broken down, so if necessary, would you be able to limit piece by piece by prompting continue to each. I mean i want things like the particles, verbs, and all components making up the grammar. ${gpttext}`; 
                 navigator.clipboard.writeText(chatgptprompt);
                 window.open(`https://www.chatgpt.com/`);
             }
