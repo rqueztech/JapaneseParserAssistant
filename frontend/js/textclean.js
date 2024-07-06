@@ -3394,7 +3394,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inputText = inputText.replace(eliminateLeadingSpaces, '');
         inputText = inputText.replace(eliminateUnwantedWords, '');
 
-        console.log(inputText);
 
         return inputText.split('\n');
     }
@@ -3413,9 +3412,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let kanjiimportant = "";
             let kanjidefinitions = "";
             let onyomireadings = "";
-            let onyomifrequency = "";
+            let onyomifrequency = 0;
             let kunyomireadings = "";
-            let kunyomifrequency = "";
+            let kunyomifrequency = 0;
             let root = "";
 
             if (definitionsmap && definitionsmap.has(currentkanji)) {
@@ -3614,8 +3613,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (kanji.match(isakanji)) {
                     let kanjitype = "";
                     let defintion = "";
-                    let onyomifrequency = "";
-                    let kunyomifrequency = "";
+                    let onyomifrequency = 0;
+                    let kunyomifrequency = 0;
                     let onyomireadings = "";
                     let kunyoimreadings = "";
                     let importantinformation = document.createTextNode('');
@@ -3627,6 +3626,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     if (currentcount === 0 && currentlinemax === 1) {
                         mostlikely = "Onyomi";
+                    }
+
+                    else if (currentcount === 1 && currentlinemax === 2) {
+                        console.log(kanji)
+                        if (line[currentcount - 1].match(isakanji)) {
+                            mostlikely = "Onyomi";
+                        } else {
+                            mostlikely = "Kunyomi";
+                        }
                     }
                     else if (currentcount === 0 && currentlinemax > 1) {
                         if (line[currentcount + 1].match(isakanji)) {
@@ -3642,7 +3650,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             mostlikely = "Kunyomi";
                         }
                     }
-                    else if (currentcount === currentlinemax) {
+                    else if (currentcount === currentlinemax && currentlinemax > 1) {
                         if (line[currentcount - 1].match(isakanji)) {
                             mostlikely = "Onyomi";
                         } else {
@@ -3660,14 +3668,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (kanjitype[0] === "Onyomi") {
                             definition = kanjitype[3];
                             definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                            onyomifrequency = kanjitype[2];
+                            onyomifrequency = parseInt(kanjitype[2], 10);
                             onyomireadings = kanjitype[1];
                             
                             innerspan.appendChild(document.createTextNode('Onyomi'));
                             innerspan.appendChild(document.createElement('br'));
-                            if(onyomifrequency === "1") {
+                            if(onyomifrequency === 1) {
                                 innerspan.appendChild(document.createTextNode(onyomireadings));
                                 innerspan.appendChild(document.createElement('br'));
+                            } else {
+                                let splitonyomireadings = onyomireadings.split('、');
+                                let count = 0;
+                                splitonyomireadings.forEach(link => {
+                                    innerspan.appendChild(document.createTextNode(`${++count}. ${line}`));
+                                    innerspan.appendChild(document.createElement('br'));
+                                });
                             }
                             innerspan.appendChild(document.createTextNode(definition));
                             innerspan.appendChild(document.createElement('br'));
@@ -3675,12 +3690,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else if (kanjitype[0] === "Kunyomi") {
                             definition = kanjitype[3];
                             definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                            kunyomifrequency = kanjitype[2];
+                            kunyomifrequency = parseInt(kanjitype[2], 10);
                             kunyomireadings = kanjitype[1];
                             innerspan.appendChild(document.createTextNode('Kunyomi'));
                             innerspan.appendChild(document.createElement('br'));
-                            if(kunyomifrequency === "1") {
+                            if(kunyomifrequency === 1) {
                                 innerspan.appendChild(document.createTextNode(kunyomireadings));
+                                console.log("KunyomiRead --->", kunyomireadings)
                                 innerspan.appendChild(document.createElement('br'));
                             }
                             innerspan.appendChild(document.createTextNode(definition));
@@ -3689,19 +3705,34 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else if (kanjitype[0] === "Both") {
                             definition = kanjitype[5];
                             definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                            onyomifrequency = kanjitype[2];
+                            onyomifrequency = parseInt(kanjitype[2], 10);
                             onyomireadings = kanjitype[1];
-                            kunyomifrequency = kanjitype[4];
-                            kunyoimreadings = kanjitype[3];
+                            kunyomifrequency = parseInt(kanjitype[4], 10);
+                            kunyomireadings = kanjitype[3];
                             innerspan.appendChild(document.createTextNode(mostlikely));
-                            console.log("MOST ---> ", mostlikely, line[currentcount]);
                             innerspan.appendChild(document.createElement('br'));
-                            if(mostlikely === "Onyomi" && onyomifrequency === "1") {
+                            if(mostlikely === "Onyomi" && onyomifrequency === 1) {
                                 innerspan.appendChild(document.createTextNode(onyomireadings));
                                 innerspan.appendChild(document.createElement('br'));
-                            } else if (mostlikely === "Kunyomi" && kunyomifrequency === "1") {
+                            } else if (mostlikely === "Kunyomi" && kunyomifrequency === 1) {
                                 innerspan.appendChild(document.createTextNode(kunyoimreadings));
                                 innerspan.appendChild(document.createElement('br'));
+                            } else {
+                                if (mostlikely === "Onyomi") {
+                                    let splitonyomireadings = onyomireadings.split('、');
+                                    let count = 0;
+                                    splitonyomireadings.forEach(link => {
+                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                                        innerspan.appendChild(document.createElement('br'));
+                                    });
+                                } else if (mostlikely === "Kunyomi") {
+                                    let splitkunyomireadings = kunyomireadings.split('、');
+                                    let count = 0;
+                                    splitkunyomireadings.forEach(link => {
+                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                                        innerspan.appendChild(document.createElement('br'));
+                                    });
+                                }
                             }
                             innerspan.appendChild(document.createTextNode(definition));
                             innerspan.appendChild(document.createElement('br'));
