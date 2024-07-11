@@ -1917,7 +1917,7 @@ async function populateMapsAsync() {
                 definitionsmap.set('隅', 'Both*グウ*1*すみ*1*corner');
                 definitionsmap.set('隔', 'Both*カク*1*へだ－てる、へだ－たる*2*isolate');
                 definitionsmap.set('際', 'Both*サイ*1*きわ*1*occasion');
-                definitionsmap.set('障', 'Both*ショウ*1*さわ－る*1*hurt');
+                definitionsmap.set('障', 'Both*ショウ*1*さわ－る*1*hinder, hurt');
                 definitionsmap.set('隠', 'Both*イン*1*かく－す、かく－れる*2*conceal');
                 definitionsmap.set('隣', 'Both*リン*1*とな－る、となり*2*neighboring');
                 definitionsmap.set('雄', 'Both*ユウ*1*お、おす*2*male');
@@ -2009,8 +2009,6 @@ async function populateMapsAsync() {
                 definitionsmap.set('誰', 'Both*スイ*1*だれ*1*who （question word）');
                 definitionsmap.set('挨', 'Both*アイ*1*ひら－く*1*push open');
                 definitionsmap.set('拶', 'Both*サツ*1*あいさつ*1*be imminent');
-
-
 				transativitymap.set('丸い','iAdj*Round*まるい');
 				transativitymap.set('互い','iAdj*Each other*たがい');
 				transativitymap.set('亡い','iAdj*Not present; doesn’t exist*ない');
@@ -3399,7 +3397,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function createkanjiboxes(kanjionlycleaned) {
+        let counter = 0;
+
         for (let kanji of kanjionlycleaned) {
+            counter++;
             let boxid = kanji;
 
             let kanjiboxlink = document.createElement('div');
@@ -3499,16 +3500,29 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         a.target = '_blank';
                         a.textContent = transtype;
+                        a.setAttribute('tabindex', '-1');
 
                         const outerspan = document.createElement('span');
                         outerspan.classList.add('tooltip');
+                        outerspan.setAttribute('role', 'tooltip');
+                        outerspan.setAttribute('aria-hidden', 'true');
+                        outerspan.setAttribute('aria-label', 'This is a tooltip');
+                        outerspan.setAttribute('tabindex', '0');
+
+                        outerspan.addEventListener('focus', function() {
+                            outerspan.setAttribute('aria-hidden', 'false');
+                        });
+
+                        outerspan.addEventListener('blur', function() {
+                            outerspan.setAttribute('aria-hidden', 'true');
+                        });
+
                         outerspan.appendChild(a);
+
 
                         const innerspan = document.createElement('span');
                         innerspan.classList.add('tooltip-text');
-
                         innerspan.textContent = transplit[1];
-
 
                         outerspan.appendChild(innerspan);
                         
@@ -3610,6 +3624,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             for(let kanji of line) {
                 const locallink = document.createElement('a');
+                locallink.setAttribute('tabindex', '-1');
                 encodedkanji = encodeURIComponent(kanji);
                 locallink.href = `#${encodedkanji}`;
                 locallink.textContent = kanji;
@@ -3625,6 +3640,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const outerspan = document.createElement('span');
                     outerspan.classList.add('tooltip');
+                    outerspan.setAttribute('role', 'tooltip');
+                    outerspan.setAttribute('tabindex', '0');
                 
                     outerspan.appendChild(locallink);
 
@@ -3674,7 +3691,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let splitonyomireadings = onyomireadings.split('、');
                                 let count = 0;
                                 splitonyomireadings.forEach(link => {
-                                    innerspan.appendChild(document.createTextNode(`${++count}. ${onyomireadings}`));
+                                    innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
                                     innerspan.appendChild(document.createElement('br'));
                                 });
                             }
