@@ -3760,7 +3760,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let count = 0;
                                 splitkunyomireadings.forEach(link => {
                                     if (kunyomifrequency === 1) {
-                                        innerspan.appendChild(document.createTextNode(link));
+                                        innerspan.appendChild(document.createTextNode(`${link}`));
                                     } else if (kunyomifrequency > 1) {
                                         innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
                                     }
