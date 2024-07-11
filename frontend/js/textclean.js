@@ -3396,28 +3396,29 @@ document.addEventListener('DOMContentLoaded', function() {
         return inputText.split('\n');
     }
 
-    async function checkTransativityMap(link, fullword) {
+    async function checkTransativityMap(fullword) {
         if (transativitymap.has(fullword)) {
             transplit = transativitymap.get(fullword);
 
             transplit = transplit.split('*');
             if (transplit[0] === 'Transative') {
-                transtype = link + ' (他 - Tr)';
+                transtype = '(他 - Tr)';
             } else if (transplit[0] === 'Intransative'){
-                transtype = link + ' (自 - In)';
+                transtype = '(自 - In)';
             } else if (transplit[0] === 'Both') {
-                transtype = link + ' (他 - Tr, 自 - In)';
+                transtype = '(他 - Tr, 自 - In)';
             } else if (transplit[0] === 'iAdj') {
-                transtype = link + ' (iAdj)';
+                transtype = '(iAdj)';
             } else if (transplit[0] === 'Noun') {
-                transtype = link + ' (N)';
+                transtype = '(N)';
             } else if (transplit[0] === 'naAdj') {
-                transtype = link + ' (naAdv)';
+                transtype = '(naAdv)';
             }
         } else {
-            transtype = fullword + ' Root';
-            root = fullword;
+            transtype = fullword + 'Root';
         }
+
+        return transtype;
     }
 
     async function createkanjiboxes(kanjionlycleaned) {
@@ -3440,7 +3441,6 @@ document.addEventListener('DOMContentLoaded', function() {
             let onyomifrequency = 0;
             let kunyomireadings = "";
             let kunyomifrequency = 0;
-            let root = "";
 
             if (definitionsmap && definitionsmap.has(currentkanji)) {
                 kanjiimportant = definitionsmap.get(currentkanji).split('*');
@@ -3509,11 +3509,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         let a = document.createElement('a');
                         a.href = `https://www.jisho.org/search/${encodedkanji}%20${link.replace('－', '')}`;
                         
-                        let transtype = await checkTransativityMap(link, fullword);
-
+                        let transtype = await checkTransativityMap(fullword);
+                        let translink = link + transtype;
                         
                         a.target = '_blank';
-                        a.textContent = transtype;
+                        a.textContent = translink;
                         a.setAttribute('tabindex', '-1');
 
                         const outerspan = document.createElement('span');
@@ -3615,6 +3615,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function checkKanjiReading(line, currentlinemax, currentposition) {
+        if (currentlinemax === 1 && currentposition === 0) {
+            mostlikely = "Onyomi";
+        } else {
+            if (currentposition === 0) {
+                if(line[currentposition + 1].match(isakanji)) {
+                    mostlikely = "Onyomi";
+                } else {
+                    mostlikely = "Kunyomi";
+                }
+            } else if (currentposition === line.length - 1) {
+                if(line[currentposition - 1].match(isakanji)) {
+                    mostlikely = "Onyomi";
+                } else {
+                    mostlikely = "Kunyomi";
+                }
+            } else {
+                if(line[currentposition - 1].match(isakanji) || line[currentposition + 1].match(isakanji)) {
+                    mostlikely = "Onyomi";
+                } else {
+                    mostlikely = "Kunyomi";
+                }
+            }
+        }
+
+        return mostlikely;
+    }
 
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -3659,33 +3686,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     outerspan.setAttribute('tabindex', '0');
                 
 
-                    if (currentlinemax === 1 && currentposition === 0) {
-                        mostlikely = "Onyomi";
-                    } else {
-                        if (currentposition === 0) {
-                            if(line[currentposition + 1].match(isakanji)) {
-                                mostlikely = "Onyomi";
-                            } else {
-                                mostlikely = "Kunyomi";
-                            }
-                        } else if (currentposition === line.length - 1) {
-                            if(line[currentposition - 1].match(isakanji)) {
-                                mostlikely = "Onyomi";
-                            } else {
-                                mostlikely = "Kunyomi";
-                            }
-                        } else {
-                            if(line[currentposition - 1].match(isakanji) || line[currentposition + 1].match(isakanji)) {
-                                mostlikely = "Onyomi";
-                            } else {
-                                mostlikely = "Kunyomi";
-                            }
-                        }
-                    }
-
-
+                    mostlikely = await checkKanjiReading (line, currentlinemax, currentposition)
+                    
                     if (definitionsmap.has(kanji)) {
-
                         outerspan.appendChild(locallink);
                         const innerspan = document.createElement('span');
                         innerspan.classList.add('tooltip-text');
@@ -3769,11 +3772,40 @@ document.addEventListener('DOMContentLoaded', function() {
                             } else if (mostlikely === "Kunyomi") {
                                 let splitkunyomireadings = kunyomireadings.split('、');
                                 let count = 0;
-                                splitkunyomireadings.forEach(link => {
+                                splitkunyomireadings.forEach(async (link) => {
+
+                                    console.log(link);
+                                    try {
+                                        let result = await link;
+                                    } catch (error) {
+                                        console.error(error);
+                                    }
+
+                                    let fullword = "";
                                     if (kunyomifrequency === 1) {
+                                        let splitlink = "";
+                                        let secondword = "";
+                                        let transplit = "";
+
+                                        if(link.includes('－')) {
+                                            splitlink = link.split('－');
+                                            secondword = splitlink[1];
+                                            fullword = `${kanji}${secondword}`;
+                                        } else {
+                                            fullword = link;
+                                        }
+
+                                        let transitivity = await checkTransativityMap(fullword);
+                                        innerspan.appendChild(document.createElement('br'));
                                         innerspan.appendChild(document.createTextNode(link));
+
+                                        innerspan.appendChild(document.createElement('br'));
+                                        innerspan.appendChild(document.createTextNode(transitivity));
                                     } else if (kunyomifrequency > 1) {
+                                        let transitivity = await checkTransativityMap(fullword);
+                                        innerspan.appendChild(document.createElement('br'));
                                         innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                                        innerspan.appendChild(document.createTextNode(transitivity));
                                     }
                                     innerspan.appendChild(document.createElement('br'));
                                 });
