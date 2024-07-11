@@ -3396,6 +3396,30 @@ document.addEventListener('DOMContentLoaded', function() {
         return inputText.split('\n');
     }
 
+    async function checkTransativityMap(link, fullword) {
+        if (transativitymap.has(fullword)) {
+            transplit = transativitymap.get(fullword);
+
+            transplit = transplit.split('*');
+            if (transplit[0] === 'Transative') {
+                transtype = link + ' (他 - Tr)';
+            } else if (transplit[0] === 'Intransative'){
+                transtype = link + ' (自 - In)';
+            } else if (transplit[0] === 'Both') {
+                transtype = link + ' (他 - Tr, 自 - In)';
+            } else if (transplit[0] === 'iAdj') {
+                transtype = link + ' (iAdj)';
+            } else if (transplit[0] === 'Noun') {
+                transtype = link + ' (N)';
+            } else if (transplit[0] === 'naAdj') {
+                transtype = link + ' (naAdv)';
+            }
+        } else {
+            transtype = fullword + ' Root';
+            root = fullword;
+        }
+    }
+
     async function createkanjiboxes(kanjionlycleaned) {
         let counter = 0;
 
@@ -3430,6 +3454,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     let kanjidefinitions = document.createTextNode(kanjidefinitiontext);
                     
                     let kanjilink = document.createElement('a');
+
                     encodedkanji = encodeURIComponent(kanji);
                     kanjilink.class = 'kanjilink';
                     kanjilink.href = `https://www.jisho.org/search/${encodedkanji}%20%23kanji`;
@@ -3457,7 +3482,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     kanjiboxlink.appendChild(kunyomiCount);
                     kanjiboxlink.appendChild(document.createElement('br'));
 
-                    kunyomireadings.forEach(link => {
+                    kunyomireadings.forEach(async (link) => {
+                        try {
+                            let result = await link;
+                        } catch (error) {
+                            console.error(error);
+                        }
+
+
                         let splitlink = "";
                         let fullword = "";
                         let secondword = "";
@@ -3472,32 +3504,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             fullword = link;
                         }
 
-                        let transtype = "";
 
                         encodedkanji = encodeURIComponent(currentkanji);
                         let a = document.createElement('a');
                         a.href = `https://www.jisho.org/search/${encodedkanji}%20${link.replace('－', '')}`;
-                        if (transativitymap.has(fullword)) {
-                            transplit = transativitymap.get(fullword);
+                        
+                        let transtype = await checkTransativityMap(link, fullword);
 
-                            transplit = transplit.split('*');
-                            if (transplit[0] === 'Transative') {
-                                transtype = link + ' (他 - Tr)';
-                            } else if (transplit[0] === 'Intransative'){
-                                transtype = link + ' (自 - In)';
-                            } else if (transplit[0] === 'Both') {
-                                transtype = link + ' (他 - Tr, 自 - In)';
-                            } else if (transplit[0] === 'iAdj') {
-                                transtype = link + ' (iAdj)';
-                            } else if (transplit[0] === 'Noun') {
-                                transtype = link + ' (N)';
-                            } else if (transplit[0] === 'naAdj') {
-                                transtype = link + ' (naAdv)';
-                            }
-                        } else {
-                            transtype = fullword + ' Root';
-                            root = fullword;
-                        }
+                        
                         a.target = '_blank';
                         a.textContent = transtype;
                         a.setAttribute('tabindex', '-1');
@@ -3542,6 +3556,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     kanjilink.href = `https://www.jisho.org/search/${encodedkanji}%20%23kanji`;
                     kanjilink.target = '_blank';
                     kanjilink.textContent = kanji;
+
 
                     let onyomiCount = document.createTextNode(`(${onyomifrequency})`)
                     let onyomiTag = document.createTextNode('Onyomi');
@@ -3643,12 +3658,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     outerspan.setAttribute('role', 'tooltip');
                     outerspan.setAttribute('tabindex', '0');
                 
-                    outerspan.appendChild(locallink);
 
                     if (currentlinemax === 1 && currentposition === 0) {
                         mostlikely = "Onyomi";
                     } else {
-
                         if (currentposition === 0) {
                             if(line[currentposition + 1].match(isakanji)) {
                                 mostlikely = "Onyomi";
@@ -3672,6 +3685,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
                     if (definitionsmap.has(kanji)) {
+
+                        outerspan.appendChild(locallink);
                         const innerspan = document.createElement('span');
                         innerspan.classList.add('tooltip-text');
                         kanjitype = definitionsmap.get(kanji).split('*');
@@ -3681,7 +3696,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             definition = definition.charAt(0).toUpperCase() + definition.slice(1);
                             onyomifrequency = parseInt(kanjitype[2], 10);
                             onyomireadings = kanjitype[1];
-                            
+
+
+                            if(onyomifrequency === 1) {
+                                locallink.classList.add('special-link');
+                            }
+
                             innerspan.appendChild(document.createTextNode('Onyomi'));
                             innerspan.appendChild(document.createElement('br'));
                             if(onyomifrequency === 1) {
@@ -3712,6 +3732,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 let splitkunyomireadings = kanjitype[3].split('、');
                                 let count = 0;
                                 splitkunyomireadings.forEach (link => {
+                                    console.log(count, ' :: ', link)
                                     innerspan.appendChild(document.createTextNode(`${count}. ${link}`));
                                     innerspan.appendChild(document.createElement(`br`));
                                 });
@@ -3726,6 +3747,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             onyomireadings = kanjitype[1];
                             kunyomifrequency = parseInt(kanjitype[2], 10);
                             kunyomireadings = kanjitype[3];
+
+                            if(onyomifrequency === 1) {
+                                locallink.classList.add('special-link');
+                            }
+
                             innerspan.appendChild(document.createTextNode(mostlikely));
                             innerspan.appendChild(document.createElement('br'));
                                 

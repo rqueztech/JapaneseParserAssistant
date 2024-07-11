@@ -22,7 +22,6 @@ button {
 
 .tooltip {
     font-size: 30px;
-    color: black;
     position: relative;
     display: inline-block;
     cursor: pointer;
@@ -84,6 +83,13 @@ button {
     font-weight: bold;
     color: black;
 }
+
+.titlelinks a.special-link {
+    text-decocration: none;
+    font-weight: bold;
+    color: darkred;
+}
+
 
 .titlelinks {
     padding-top: 20px;
