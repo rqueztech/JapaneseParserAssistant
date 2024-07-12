@@ -3625,12 +3625,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     outerspan.setAttribute('aria-hidden', 'true');
                 });
 
+                outerspan.addEventListener('keydown', function(event) {
+                    if(event.key === 'Enter') {
+                        event.preventDefault();
+                        outerspan.setAttribute('aria-hidden', 'true');
+
+                        const a = outerspan.querySelector('a');
+                        if(a) {
+                            a.click();
+                        }
+                    }
+                });
+
                 outerspan.appendChild(a);
 
 
                 const innerspan = document.createElement('span');
                 innerspan.classList.add('tooltip-text');
-                innerspan.textContent = transplit[1];
+                innerspan.textContent = transplit[1].charAt(0).toUpperCase() + transplit[1].slice(1);
 
                 outerspan.appendChild(innerspan);
                 
