@@ -3456,7 +3456,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function writeKunyomiInTitle(innerspan, kanjitype, locallink) {
-
         let kunyomifrequency = parseInt(kanjitype[2], 10);
         let kunyomireadings = kanjitype[1];
         innerspan.appendChild(document.createTextNode('Kunyomi'));
@@ -3579,6 +3578,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let onyomiCount = document.createTextNode(`(${onyomifrequency})`);
         let kunyomiTag = document.createTextNode('Kunyomi');
         let kunyomiCount = document.createTextNode(`(${kunyomifrequency})`)
+        let transtype = "";
 
         kanjiboxlink.appendChild(kanjilink);
         kanjiboxlink.appendChild(document.createElement('br'));
@@ -3603,7 +3603,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let a = document.createElement('a');
                 a.href = `https://www.jisho.org/search/${encodedkanji}%20${link.replace('－', '')}`;
                 
-                let transtype = await checkTransativityMap(fullword);
+                transtype = await checkTransativityMap(fullword);
                 let translink = link + transtype;
                 
                 a.target = '_blank';
@@ -3642,7 +3642,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const innerspan = document.createElement('span');
                 innerspan.classList.add('tooltip-text');
-                innerspan.textContent = transplit[1].charAt(0).toUpperCase() + transplit[1].slice(1);
 
                 outerspan.appendChild(innerspan);
                 
@@ -3720,7 +3719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         definition = definition.charAt(0).toUpperCase() + definition.slice(1);
         let onyomifrequency = parseInt(kanjitype[2], 10);
         let onyomireadings = kanjitype[1];
-        let kunyomifrequency = parseInt(kanjitype[2], 10);
+        let kunyomifrequency = parseInt(kanjitype[4], 10);
         let kunyomireadings = kanjitype[3];
 
         if(onyomifrequency === 1) {
@@ -3784,8 +3783,6 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
         outputContainer.innerHTML = ''; // Clear previous output
-        currentIndex = 0; // Reset current index
-        outputContainersHTML.length = 0; // Clear outputContainersHTML array
 
         const tokenizedWords = await cleanUserInput();
         let currentposition = 0;
@@ -3909,8 +3906,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Store current state of outputContainer
+        
+        currentIndex = outputContainersHTML.length;
         outputContainersHTML[currentIndex] = outputContainer.innerHTML;
-        currentIndex++;
         userInput.value = ''; // Clear input field
     });
 
