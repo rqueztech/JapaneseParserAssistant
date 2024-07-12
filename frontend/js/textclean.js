@@ -3416,7 +3416,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 transtype = '(naAdv)';
             }
         } else {
-            transtype = fullword + 'Root';
+            transtype = 'Root';
         }
 
         return transtype;
@@ -3455,6 +3455,59 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    async function writeKunyomiInTitle(innerspan, kanjitype, locallink) {
+
+        let kunyomifrequency = parseInt(kanjitype[2], 10);
+        let kunyomireadings = kanjitype[1];
+        innerspan.appendChild(document.createTextNode('Kunyomi'));
+        innerspan.appendChild(document.createElement('br'));
+        if(kunyomifrequency === 1) {
+            innerspan.appendChild(document.createTextNode(kunyomireadings));
+            innerspan.appendChild(document.createElement('br'));
+        } else {
+            let splitkunyomireadings = kanjitype[3].split('、');
+            let count = 0;
+            splitkunyomireadings.forEach (link => {
+                let definition = kanjitype[3];
+                definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+                innerspan.appendChild(document.createTextNode(`${count}. ${link}`));
+                innerspan.appendChild(document.createElement(`br`));
+            });
+        }
+        innerspan.appendChild(document.createElement('br'));
+        innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+    }
+
+    async function writeOnyomiInTitle(innerspan, kanjitype, locallink) {
+        let definition = kanjitype[3];
+        definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+        let onyomifrequency = parseInt(kanjitype[2], 10);
+        let onyomireadings = kanjitype[1];
+
+
+        if(onyomifrequency === 1) {
+            locallink.classList.add('special-link');
+        }
+
+        innerspan.appendChild(document.createTextNode('Onyomi'));
+        innerspan.appendChild(document.createElement('br'));
+        if(onyomifrequency === 1) {
+            innerspan.appendChild(document.createTextNode(onyomireadings));
+            innerspan.appendChild(document.createElement('br'));
+        } else {
+            let splitonyomireadings = onyomireadings.split('、');
+            let count = 0;
+            splitonyomireadings.forEach(link => {
+                innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                innerspan.appendChild(document.createElement('br'));
+            });
+        }
+        innerspan.appendChild(document.createTextNode(definition));
+        innerspan.appendChild(document.createElement('br'));
+        innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+
+    }
+
     async function processKunyomiCreateBox(kanji, kanjiboxlink, kanjiimportant) {
         let kunyomireadings = kanjiimportant[1].split('、');
         let kunyomifrequency = kanjiimportant[2];
@@ -3488,6 +3541,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    async function createFullWord(link, kanji) {
+        let splitlink = "";
+        let fullword = "";
+        let secondword = "";
+        let transplit = "";
+
+
+        if(link.includes('－')) {
+            splitlink = link.split('－');
+            secondword = splitlink[1];
+            fullword = `${kanji}${secondword}`;
+        } else {
+            fullword = link;
+        }
+
+        return fullword;
+    }
+
     async function processBothCreateBox(kanji, kanjiboxlink, kanjiimportant) {
         let onyomireadings = document.createTextNode(kanjiimportant[1]);
         let onyomifrequency = kanjiimportant[2];
@@ -3518,75 +3589,57 @@ document.addEventListener('DOMContentLoaded', function() {
         kanjiboxlink.appendChild(onyomiCount);
         kanjiboxlink.appendChild(document.createElement('br'));
 
-
         kanjiboxlink.appendChild(onyomireadings);
         kanjiboxlink.appendChild(document.createElement('br'));
         kanjiboxlink.appendChild(kunyomiTag);
         kanjiboxlink.appendChild(kunyomiCount);
         kanjiboxlink.appendChild(document.createElement('br'));
 
-        kunyomireadings.forEach(async (link) => {
+        for(let link of kunyomireadings) {
             try {
-                let result = await link;
-            } catch (error) {
-                console.error(error);
-            }
+                let fullword = await createFullWord(link, kanji);
 
+                encodedkanji = encodeURIComponent(kanji);
+                let a = document.createElement('a');
+                a.href = `https://www.jisho.org/search/${encodedkanji}%20${link.replace('－', '')}`;
+                
+                let transtype = await checkTransativityMap(fullword);
+                let translink = link + transtype;
+                
+                a.target = '_blank';
+                a.textContent = translink;
+                a.setAttribute('tabindex', '-1');
 
-            let splitlink = "";
-            let fullword = "";
-            let secondword = "";
-            let transplit = "";
-
-
-            if(link.includes('－')) {
-                splitlink = link.split('－');
-                secondword = splitlink[1];
-                fullword = `${kanji}${secondword}`;
-            } else {
-                fullword = link;
-            }
-
-
-            encodedkanji = encodeURIComponent(kanji);
-            let a = document.createElement('a');
-            a.href = `https://www.jisho.org/search/${encodedkanji}%20${link.replace('－', '')}`;
-            
-            let transtype = await checkTransativityMap(fullword);
-            let translink = link + transtype;
-            
-            a.target = '_blank';
-            a.textContent = translink;
-            a.setAttribute('tabindex', '-1');
-
-            const outerspan = document.createElement('span');
-            outerspan.classList.add('tooltip');
-            outerspan.setAttribute('role', 'tooltip');
-            outerspan.setAttribute('aria-hidden', 'true');
-            outerspan.setAttribute('aria-label', 'This is a tooltip');
-            outerspan.setAttribute('tabindex', '0');
-
-            outerspan.addEventListener('focus', function() {
-                outerspan.setAttribute('aria-hidden', 'false');
-            });
-
-            outerspan.addEventListener('blur', function() {
+                const outerspan = document.createElement('span');
+                outerspan.classList.add('tooltip');
+                outerspan.setAttribute('role', 'tooltip');
                 outerspan.setAttribute('aria-hidden', 'true');
-            });
+                outerspan.setAttribute('aria-label', 'This is a tooltip');
+                outerspan.setAttribute('tabindex', '0');
 
-            outerspan.appendChild(a);
+                outerspan.addEventListener('focus', function() {
+                    outerspan.setAttribute('aria-hidden', 'false');
+                });
+
+                outerspan.addEventListener('blur', function() {
+                    outerspan.setAttribute('aria-hidden', 'true');
+                });
+
+                outerspan.appendChild(a);
 
 
-            const innerspan = document.createElement('span');
-            innerspan.classList.add('tooltip-text');
-            innerspan.textContent = transplit[1];
+                const innerspan = document.createElement('span');
+                innerspan.classList.add('tooltip-text');
+                innerspan.textContent = transplit[1];
 
-            outerspan.appendChild(innerspan);
-            
-            kanjiboxlink.appendChild(outerspan);
-            kanjiboxlink.appendChild(document.createElement('br'));
-        });
-
+                outerspan.appendChild(innerspan);
+                
+                kanjiboxlink.appendChild(outerspan);
+                kanjiboxlink.appendChild(document.createElement('br'));
+            } catch (error) {
+                console.log(error);
+            }
+        }
     }
 
     async function createkanjiboxes(kanjionlycleaned) {
@@ -3650,6 +3703,72 @@ document.addEventListener('DOMContentLoaded', function() {
         return mostlikely;
     }
 
+    async function writeBothInTitle(kanji, innerspan, kanjitype, locallink) {
+        let definition = kanjitype[5];
+        definition = definition.charAt(0).toUpperCase() + definition.slice(1);
+        let onyomifrequency = parseInt(kanjitype[2], 10);
+        let onyomireadings = kanjitype[1];
+        let kunyomifrequency = parseInt(kanjitype[2], 10);
+        let kunyomireadings = kanjitype[3];
+
+        if(onyomifrequency === 1) {
+            locallink.classList.add('special-link');
+        }
+
+        innerspan.appendChild(document.createTextNode(mostlikely));
+        innerspan.appendChild(document.createElement('br'));
+            
+        if (mostlikely === "Onyomi") {
+            let splitonyomireadings = onyomireadings.split('、');
+            let count = 0;
+            splitonyomireadings.forEach(link => {
+                if (onyomifrequency === 1) {
+                    innerspan.appendChild(document.createTextNode(link));
+                } else if (onyomifrequency > 1) {
+                    innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                }
+                innerspan.appendChild(document.createElement('br'));
+            });
+        } else if (mostlikely === "Kunyomi") {
+            let splitkunyomireadings = kunyomireadings.split('、');
+            let count = 0;
+            splitkunyomireadings.forEach(async (link) => {
+                try {
+                    let result = await link;
+                } catch (error) {
+                    console.error(error);
+                }
+
+                let fullword = await createFullWord(link, kanji);
+
+                if (kunyomifrequency === 1) {
+                    let transitivity = await checkTransativityMap(fullword);
+                    innerspan.appendChild(document.createElement('br'));
+                    innerspan.appendChild(document.createTextNode(link));
+
+                    innerspan.appendChild(document.createElement('br'));
+                    innerspan.appendChild(document.createTextNode(transitivity));
+                } else if (kunyomifrequency > 1) {
+                    let transitivity = await checkTransativityMap(fullword);
+                    innerspan.appendChild(document.createElement('br'));
+                    innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
+                    innerspan.appendChild(document.createTextNode(transitivity));
+                }
+
+                innerspan.appendChild(document.createElement('br'));
+            });
+        } else {
+            innerspan.appendChild(document.createTextNode('Edge Case'));
+            innerspan.appendChild(document.createElement('br'));
+        }
+
+        innerspan.appendChild(document.createTextNode(definition));
+        innerspan.appendChild(document.createElement('br'));
+        innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+        innerspan.appendChild(document.createElement('br'));
+        innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+    }
+
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
         outputContainer.innerHTML = ''; // Clear previous output
@@ -3679,12 +3798,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 locallink.textContent = kanji;
 
                 if (kanji.match(isakanji)) {
-                    let kanjitype = "";
-                    let defintion = "";
-                    let onyomifrequency = 0;
-                    let kunyomifrequency = 0;
-                    let onyomireadings = "";
-                    let kunyoimreadings = "";
                     let importantinformation = document.createTextNode('');
 
                     const outerspan = document.createElement('span');
@@ -3699,133 +3812,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         outerspan.appendChild(locallink);
                         const innerspan = document.createElement('span');
                         innerspan.classList.add('tooltip-text');
-                        kanjitype = definitionsmap.get(kanji).split('*');
+                        let kanjitype = definitionsmap.get(kanji).split('*');
 
                         if (kanjitype[0] === "Onyomi") {
-                            definition = kanjitype[3];
-                            definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                            onyomifrequency = parseInt(kanjitype[2], 10);
-                            onyomireadings = kanjitype[1];
-
-
-                            if(onyomifrequency === 1) {
-                                locallink.classList.add('special-link');
-                            }
-
-                            innerspan.appendChild(document.createTextNode('Onyomi'));
-                            innerspan.appendChild(document.createElement('br'));
-                            if(onyomifrequency === 1) {
-                                innerspan.appendChild(document.createTextNode(onyomireadings));
-                                innerspan.appendChild(document.createElement('br'));
-                            } else {
-                                let splitonyomireadings = onyomireadings.split('、');
-                                let count = 0;
-                                splitonyomireadings.forEach(link => {
-                                    innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
-                                    innerspan.appendChild(document.createElement('br'));
-                                });
-                            }
-                            innerspan.appendChild(document.createTextNode(definition));
-                            innerspan.appendChild(document.createElement('br'));
-                            innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
+                            await writeOnyomiInTitle(innerspan, kanjitype, locallink);
                         } else if (kanjitype[0] === "Kunyomi") {
-                            definition = kanjitype[3];
-                            definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                            kunyomifrequency = parseInt(kanjitype[2], 10);
-                            kunyomireadings = kanjitype[1];
-                            innerspan.appendChild(document.createTextNode('Kunyomi'));
-                            innerspan.appendChild(document.createElement('br'));
-                            if(kunyomifrequency === 1) {
-                                innerspan.appendChild(document.createTextNode(kunyomireadings));
-                                innerspan.appendChild(document.createElement('br'));
-                            } else {
-                                let splitkunyomireadings = kanjitype[3].split('、');
-                                let count = 0;
-                                splitkunyomireadings.forEach (link => {
-                                    console.log(count, ' :: ', link)
-                                    innerspan.appendChild(document.createTextNode(`${count}. ${link}`));
-                                    innerspan.appendChild(document.createElement(`br`));
-                                });
-                            }
-                            innerspan.appendChild(document.createTextNode(definition));
-                            innerspan.appendChild(document.createElement('br'));
-                            innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+                            await writeKunyomiInTitle(innerspan, kanjitype, locallink);
                         } else if (kanjitype[0] === "Both") {
-                            definition = kanjitype[5];
-                            definition = definition.charAt(0).toUpperCase() + definition.slice(1);
-                            onyomifrequency = parseInt(kanjitype[2], 10);
-                            onyomireadings = kanjitype[1];
-                            kunyomifrequency = parseInt(kanjitype[2], 10);
-                            kunyomireadings = kanjitype[3];
-
-                            if(onyomifrequency === 1) {
-                                locallink.classList.add('special-link');
-                            }
-
-                            innerspan.appendChild(document.createTextNode(mostlikely));
-                            innerspan.appendChild(document.createElement('br'));
-                                
-                            if (mostlikely === "Onyomi") {
-                                let splitonyomireadings = onyomireadings.split('、');
-                                let count = 0;
-                                splitonyomireadings.forEach(link => {
-                                    if (onyomifrequency === 1) {
-                                        innerspan.appendChild(document.createTextNode(link));
-                                    } else if (onyomifrequency > 1) {
-                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
-                                    }
-                                    innerspan.appendChild(document.createElement('br'));
-                                });
-                            } else if (mostlikely === "Kunyomi") {
-                                let splitkunyomireadings = kunyomireadings.split('、');
-                                let count = 0;
-                                splitkunyomireadings.forEach(async (link) => {
-
-                                    console.log(link);
-                                    try {
-                                        let result = await link;
-                                    } catch (error) {
-                                        console.error(error);
-                                    }
-
-                                    let fullword = "";
-                                    if (kunyomifrequency === 1) {
-                                        let splitlink = "";
-                                        let secondword = "";
-                                        let transplit = "";
-
-                                        if(link.includes('－')) {
-                                            splitlink = link.split('－');
-                                            secondword = splitlink[1];
-                                            fullword = `${kanji}${secondword}`;
-                                        } else {
-                                            fullword = link;
-                                        }
-
-                                        let transitivity = await checkTransativityMap(fullword);
-                                        innerspan.appendChild(document.createElement('br'));
-                                        innerspan.appendChild(document.createTextNode(link));
-
-                                        innerspan.appendChild(document.createElement('br'));
-                                        innerspan.appendChild(document.createTextNode(transitivity));
-                                    } else if (kunyomifrequency > 1) {
-                                        let transitivity = await checkTransativityMap(fullword);
-                                        innerspan.appendChild(document.createElement('br'));
-                                        innerspan.appendChild(document.createTextNode(`${++count}. ${link}`));
-                                        innerspan.appendChild(document.createTextNode(transitivity));
-                                    }
-                                    innerspan.appendChild(document.createElement('br'));
-                                });
-                            } else {
-                                innerspan.appendChild(document.createTextNode('Edge Case'));
-                                innerspan.appendChild(document.createElement('br'));
-                            }
-
-                            innerspan.appendChild(document.createTextNode(definition));
-                            innerspan.appendChild(document.createElement('br'));
-                            innerspan.appendChild(document.createTextNode(`On: ${onyomifrequency}`));
-                            innerspan.appendChild(document.createElement('br'));
-                            innerspan.appendChild(document.createTextNode(`Kun: ${kunyomifrequency}`));
+                            await writeBothInTitle(kanji, innerspan, kanjitype, locallink);
                         }
                         
                         outerspan.appendChild(innerspan);
