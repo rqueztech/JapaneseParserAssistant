@@ -3859,8 +3859,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
+            let jisholink = document.createElement('a');
+            jisholink.href = `https://www.jisho.org/search/${jisholink}`;
+            jisholink.textContent = 'Jisho Link';
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(jisholink);
+
             const googletranslatejapanesetoenglish = document.createElement('button');
-            googletranslatejapanesetoenglish.textContent = 'Translate';
+            googletranslatejapanesetoenglish.textContent = 'Google Translate';
             googletranslatejapanesetoenglish.style.backgroundColor = 'black';
             googletranslatejapanesetoenglish.style.color = 'white';
 
@@ -3889,26 +3895,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.open(`https://www.chatgpt.com/`);
             }
 
-            titlebox.appendChild(document.createElement('br'));
-            titlebox.appendChild(document.createElement('br'));
-            titlebox.appendChild(mainlink);
-            titlebox.appendChild(document.createElement('br'));
+            const google = document.createElement('a');
+            google.href = `https://translate.google.com/?sl=ja&tl=en&text=${line}`;
             
-            kanjilink.href = `https://www.jisho.org/search/${encodedkanji}%20%23kanji`;
-            titlebox.appendChild(document.createElement('br'));
             
-
-            titlebox.appendChild(googletranslatejapanesetoenglish);
-            titlebox.appendChild(document.createElement('br'));
 
             const googlelink = document.createElement('a');
             googlelink.href = `https://translate.google.com/?sl=ja&tl=en&text=${line}`;
             googlelink.textContent = 'Google Translate';
+            
+                        
+            google.textContent = 'Google Translate';
+            
 
             titlebox.appendChild(document.createElement('br'));
-
-            const spacenode = document.createTextNode('    ');
-            titlebox.appendChild(spacenode);
+            titlebox.appendChild(mainlink);
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(google);
+            titlebox.appendChild(document.createElement('br'));
+            titlebox.appendChild(googletranslatejapanesetoenglish);
+            titlebox.appendChild(document.createElement('br'));
             titlebox.appendChild(document.createElement('br'));
             titlebox.appendChild(chatgpt);
             outputContainer.appendChild(titlebox);
