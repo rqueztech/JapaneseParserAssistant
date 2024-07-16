@@ -3558,6 +3558,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return fullword;
     }
 
+
     async function processBothCreateBox(kanji, kanjiboxlink, kanjiimportant) {
         let onyomireadings = document.createTextNode(kanjiimportant[1]);
         let onyomifrequency = kanjiimportant[2];
@@ -3642,6 +3643,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const innerspan = document.createElement('span');
                 innerspan.classList.add('tooltip-text');
+                innerspan.textContent = transativitymap.get(fullword);
 
                 outerspan.appendChild(innerspan);
                 
