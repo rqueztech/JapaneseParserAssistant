@@ -3818,14 +3818,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const titlebox = document.createElement('div');
             titlebox.classList.add('titlelinks');
 
-            for(let kanji of fulljapanesetext) {
+            for(let currentjapanesecharacter of fulljapanesetext) {
                 const locallink = document.createElement('a');
                 locallink.setAttribute('tabindex', '-1');
-                encodedkanji = encodeURIComponent(kanji);
+                encodedkanji = encodeURIComponent(currentjapanesecharacter);
                 locallink.href = `#${encodedkanji}`;
-                locallink.textContent = kanji;
+                locallink.textContent = currentjapanesecharacter;
 
-                if (kanji.match(RegularExpressions.isakanji)) {
+                if (currentjapanesecharacter.match(RegularExpressions.isakanji)) {
                     let importantinformation = document.createTextNode('');
 
                     const outerspan = document.createElement('span');
@@ -3836,25 +3836,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     mostlikely = await checkKanjiReading (fulljapanesetext, currentlinemax, currentposition)
                     
-                    if (definitionsmap.has(kanji)) {
+                    if (definitionsmap.has(currentjapanesecharacter)) {
                         outerspan.appendChild(locallink);
                         const innerspan = document.createElement('span');
                         innerspan.classList.add('tooltip-text');
-                        let kanjitype = definitionsmap.get(kanji).split('*');
+                        let kanjitype = definitionsmap.get(currentjapanesecharacter).split('*');
 
                         if (kanjitype[0] === "Onyomi") {
                             await onyomiOps.writeOnyomiInTitle(innerspan, kanjitype, locallink);
                         } else if (kanjitype[0] === "Kunyomi") {
                             await kunyomiOps.writeKunyomiInTitle(innerspan, kanjitype, locallink);
                         } else if (kanjitype[0] === "Both") {
-                            await bothOps.writeBothInTitle(kanji, innerspan, kanjitype, locallink, mostlikely);
+                            await bothOps.writeBothInTitle(currentjapanesecharacter, innerspan, kanjitype, locallink, mostlikely);
                         }
                         
                         outerspan.appendChild(innerspan);
                         titlebox.appendChild(outerspan);
                     }
                 } else {
-                    const actualText = document.createTextNode(kanji);
+                    const actualText = document.createTextNode(currentjapanesecharacter);
                     titlebox.appendChild(actualText);
                 }
 
@@ -3879,7 +3879,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             let jisholink = document.createElement('a');
-            jisholink.href = `https://www.jisho.org/search/${jisholink}`;
+            jisholink.href = `https://www.jisho.org/search/${fulljapanesetext}`;
             jisholink.textContent = 'Jisho Link';
             titlebox.appendChild(document.createElement('br'));
             titlebox.appendChild(jisholink);
@@ -3916,7 +3916,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const google = document.createElement('a');
             google.href = `https://translate.google.com/?sl=ja&tl=en&text=${fulljapanesetext}`;
-            
             
 
             const googlelink = document.createElement('a');
