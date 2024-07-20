@@ -90,6 +90,35 @@ button {
     color: darkred;
 }
 
+.titlelinks a.special-link-blue {
+    text-decocration: none;
+    font-weight: bold;
+    color: darkblue;
+}
+
+.titlelinks a.special-link-purple {
+    text-decocration: none;
+    font-weight: bold;
+    color: #CC8899;
+}
+
+.titlelinks a.special-link-darkorange {
+    text-decocration: none;
+    font-weight: bold;
+    color: darkorange;
+}
+
+.titlelinks a.special-link-green {
+    text-decocration: none;
+    font-weight: bold;
+    color: green;
+}
+
+.titlelinks a.special-link-purple {
+    text-decocration: none;
+    font-weight: bold;
+    color: purple;
+}
 
 .titlelinks {
     padding-top: 20px;
